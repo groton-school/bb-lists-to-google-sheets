@@ -1,0 +1,34 @@
+{
+  "timeZone": "America/New_York",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "OAuth2",
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
+        "version": "43"
+      }
+    ]
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+  ],
+  "addOns": {
+    "common": {
+      "name": "Blackbaud Lists",
+      "logoUrl": "https://drive.google.com/uc?id=1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      }
+    },
+    "drive": {},
+    "sheets": {}
+  },
+  "urlFetchWhitelist": [
+    "https://oauth2.sky.blackbaud.com/",
+    "https://api.sky.blackbaud.com/"
+  ]
+}
