@@ -1,34 +1,34 @@
 {
   "timeZone": "America/New_York",
-  "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8",
   "dependencies": {
-    "libraries": [
-      {
-        "userSymbol": "OAuth2",
-        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
-        "version": "43"
-      }
-    ]
+    "libraries": [{
+      "userSymbol": "OAuth2",
+      "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
+      "version": "43"
+    }]
   },
+  "exceptionLogging": "STACKDRIVER",
   "oauthScopes": [
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
   ],
+  "urlFetchWhitelist": [
+    "https://oauth2.sky.blackbaud.com/",
+    "https://api.sky.blackbaud.com/",
+    "https://docs.google.com/",
+    "https://drive.google.com/"
+  ],
+  "runtimeVersion": "V8",
   "addOns": {
     "common": {
       "name": "Blackbaud Lists",
-      "logoUrl": "https://drive.google.com/uc?id=1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+      "logoUrl": "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
       "homepageTrigger": {
-        "runFunction": "onHomepage"
+        "runFunction": "launch"
       }
     },
     "drive": {},
     "sheets": {}
-  },
-  "urlFetchWhitelist": [
-    "https://oauth2.sky.blackbaud.com/",
-    "https://api.sky.blackbaud.com/"
-  ]
+  }
 }

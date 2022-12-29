@@ -1,9 +1,3 @@
-const SKYResponse = {
-  Raw: Symbol('raw'),
-  JSON: Symbol('json'),
-  Array: Symbol('array')
-};
-
 const SKY = {
   RESOURCE_NAME: 'Blackbaud SKY API',
   URL_AUTH: 'https://oauth2.sky.blackbaud.com/authorization',
@@ -13,13 +7,19 @@ const SKY = {
   PROP_SECRET: 'SKY_CLIENT_SECRET',
   PROP_ACCESS_KEY: 'SKY_ACCESS_KEY',
 
+  Response: {
+    Raw: Symbol('raw'),
+    JSON: Symbol('json'),
+    Array: Symbol('array')
+  },
+
   school: {
     v1: {
-      lists: (list_id = null, format = SKYResponse.JSON) => {
+      lists: (list_id = null, format = SKY.Response.JSON) => {
         if (list_id) {
           const response = SKY.call(`https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}`);
           switch (format) {
-            case SKYResponse.JSON:
+            case SKY.Response.JSON:
               return response.results.rows.map(row => {
                 const obj = {};
                 for ({name, value} of row.columns) {
@@ -27,7 +27,7 @@ const SKY = {
                 }
                 return obj;
               });
-            case SKYResponse.Array:
+            case SKY.Response.Array:
               const array = response.results.rows.map(row => {
                 const arr = [];
                 for ({name, value} of row.columns) {
@@ -37,16 +37,16 @@ const SKY = {
               });
               array.unshift(response.results.rows[0].columns.map(({name, value}) => name));
               return array;
-            case SKYResponse.Raw:
+            case SKY.Response.Raw:
             default:
               return response;
           }
         } else {
           const response = SKY.call('https://api.sky.blackbaud.com/school/v1/lists');
           switch(format) {
-            case SKYResponse.JSON:
+            case SKY.Response.JSON:
               return response.value;
-            case SKYResponse.Raw:
+            case SKY.Response.Raw:
             default:
               return response;
           }
@@ -65,7 +65,7 @@ const SKY = {
         .setTokenUrl(SKY.URL_TOKEN)
         .setClientId(scriptProperties.getProperty(SKY.PROP_CLIENT))
         .setClientSecret(scriptProperties.getProperty(SKY.PROP_SECRET))
-        .setCallbackFunction('authCallback')
+        .setCallbackFunction('__Sky_callbackAuthorization')
         .setPropertyStore(PropertiesService.getUserProperties())
         .setCache(CacheService.getUserCache())
         .setLock(LockService.getUserLock());
@@ -95,43 +95,54 @@ const SKY = {
 
     if (!maybeAuthorized) {
       CardService.newAuthorizationException()
-        .setCustomUiCallback('skyAuthorizationUi')
+        .setCustomUiCallback('__Sky.cardAuthorization')
         .throwException();
     }
   },
 
   resetService: () => {
     SKY.getService().reset();
-  }
-}
+  },
 
-function skyAuthorizationUi() {
-  return [CardService.newCardBuilder()
-    .setHeader(CardService.newCardHeader()
-      .setTitle('Authorization Required')
-    )
-    .addSection(CardService.newCardSection()
-      .setHeader('This add-on needs access to your Blackbaud account')
-      .addWidget(CardService.newTextParagraph()
-        .setText('You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.')
+  cardAuthorization: () => {
+    return [CardService.newCardBuilder()
+      .setHeader(CardService.newCardHeader()
+        .setTitle('Authorization Required')
       )
-      .addWidget(CardService.newButtonSet()
-        .addButton(CardService.newTextButton()
-          .setText('Begin Authorization')
-          .setAuthorizationAction(CardService.newAuthorizationAction()
-            .setAuthorizationUrl(SKY.getService().getAuthorizationUrl())
+      .addSection(CardService.newCardSection()
+        .addWidget(CardService.newGrid()
+          .addItem(CardService.newGridItem()
+            .setImage(CardService.newImageComponent()
+              .setImageUrl(URL_LOGO))))
+        .addWidget(CardService.newTextParagraph()
+          .setText('This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.')
+        )
+        .addWidget(CardService.newButtonSet()
+          .addButton(CardService.newTextButton()
+            .setText('Begin Authorization')
+            .setAuthorizationAction(CardService.newAuthorizationAction()
+              .setAuthorizationUrl(SKY.getService().getAuthorizationUrl())
+            )
           )
         )
       )
-    )
-    .build()];
+      .build()];
+  },
+
+  callbackAuthorization: (callbackRequest) => {
+    const authorized = SKY.getService().handleCallback(callbackRequest);
+    if (authorized) {
+      return HtmlService.createHtmlOutput("<h1>Authorized</h1>");
+    } else {
+      return HtmlService.createHtmlOutput("<h1>Denied</h1>");
+    }
+  }
 }
 
-function authCallback(callbackRequest) {
-  const authorized = SKY.getService().handleCallback(callbackRequest);
-  if (authorized) {
-    return HtmlService.createHtmlOutput("<h1>Authorized</h1>");
-  } else {
-    return HtmlService.createHtmlOutput("<h1>Denied</h1>");
-  }
+function __Sky_cardAuthorization() {
+  return SKY.cardAuthorization()
+}
+
+function __Sky_callbackAuthorization (callbackRequest) {
+  return SKY.callbackAuthorization(callbackRequest);
 }
