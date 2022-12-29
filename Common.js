@@ -44,11 +44,7 @@ function cardLists() {
     }
     card.addSection(section);
   }
-  return card.setFixedFooter(CardService.newFixedFooter()
-    .setPrimaryButton(CardService.newTextButton()
-      .setText("Report a Problem")
-      .setOpenLink(CardService.newOpenLink()
-        .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+  return card.setFixedFooter(fixedFooterReportIssue())
     .build();
 }
 
@@ -78,12 +74,16 @@ function cardListDetail() {
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionImportData')
           .setParameters({ state: State.toJSON() }))))
-    .setFixedFooter(CardService.newFixedFooter()
-      .setPrimaryButton(CardService.newTextButton()
-        .setText("Report a Problem")
-        .setOpenLink(CardService.newOpenLink()
-          .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+    .setFixedFooter(fixedFooterReportIssue())
     .build();
+}
+
+function fixedFooterReportIssue() {
+  return CardService.newFixedFooter()
+    .setPrimaryButton(CardService.newTextButton()
+      .setText("Report a Problem")
+      .setOpenLink(CardService.newOpenLink()
+        .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues')));
 }
 
 function actionImportData({ parameters: { state } }) {
@@ -160,11 +160,7 @@ function actionEmptyList(data) {
             .setText('Try Another List')
             .setOnClickAction(CardService.newAction()
               .setFunctionName('actionHome'))))
-        .setFixedFooter(CardService.newFixedFooter()
-          .setPrimaryButton(CardService.newTextButton()
-            .setText("Report a Problem")
-            .setOpenLink(CardService.newOpenLink()
-              .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+        .setFixedFooter(fixedFooterReportIssue())
         .build()))
     .build();
 }
@@ -189,11 +185,7 @@ function cardError(message = "An error occurred") {
         .setText('Start Over')
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionHome'))))
-    .setFixedFooter(CardService.newFixedFooter()
-      .setPrimaryButton(CardService.newTextButton()
-        .setText("Report a Problem")
-        .setOpenLink(CardService.newOpenLink()
-          .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+    .setFixedFooter(fixedFooterReportIssue())
     .build();
 }
 

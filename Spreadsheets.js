@@ -28,11 +28,7 @@ function cardSpreadsheetOption() {
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionNewSpreadsheet')
           .setParameters({ state: State.toJSON() }))))
-    .setFixedFooter(CardService.newFixedFooter()
-      .setPrimaryButton(CardService.newTextButton()
-        .setText("Report a Problem")
-        .setOpenLink(CardService.newOpenLink()
-          .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+    .setFixedFooter(fixedFooterReportIssue())
     .build();
 }
 
@@ -67,11 +63,7 @@ function actionUpdateSheet({ parameters: { state } }) {
             .setText('Done')
             .setOnClickAction(CardService.newAction()
               .setFunctionName('actionHome'))))
-        .setFixedFooter(CardService.newFixedFooter()
-          .setPrimaryButton(CardService.newTextButton()
-            .setText("Report a Problem")
-            .setOpenLink(CardService.newOpenLink()
-              .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues'))))
+        .setFixedFooter(fixedFooterReportIssue())
         .build()))
     .build();
 }
