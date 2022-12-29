@@ -100,7 +100,14 @@ function actionImportData({ parameters: { state } }) {
       dimensions.rows,
       dimensions.columns
     );
+
+    if (State.folder) {
+      // TODO Why doesn't the spreadsheet move to the folder?
+      DriveApp.getFileById(State.spreadsheet.getId()).moveTo(State.folder);
+    }
+
     State.sheet = State.spreadsheet.getSheets()[0];
+
   }
 
   const range = [1, 1, dimensions.rows, dimensions.columns];

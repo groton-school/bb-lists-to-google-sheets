@@ -17,7 +17,8 @@
     "https://oauth2.sky.blackbaud.com/",
     "https://api.sky.blackbaud.com/",
     "https://docs.google.com/",
-    "https://drive.google.com/"
+    "https://drive.google.com/",
+    "https://www.google.com/"
   ],
   "runtimeVersion": "V8",
   "addOns": {

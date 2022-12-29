@@ -33,6 +33,7 @@ function cardSpreadsheetOption() {
 
 function actionUpdateSheet({ parameters: { state } }) {
   State.restore(state);
+  // FIXME insert logic to detect change of sheet on update
   const data = SKY.school.v1.lists(State.metadata.list.id, SKY.Response.Array);
   const updatedRange = [State.metadata.range[0], State.metadata.range[1], data.length, data[0].length];
   if (data.length > State.metadata.range[2]) {
@@ -67,6 +68,7 @@ function actionUpdateSheet({ parameters: { state } }) {
 
 function actionAppendNewSheet({ parameters: { state } }) {
   State.restore(state);
+  // FIXME insert logic to detect change of sheet on append sheet
   State.intent = Intent.AppendSheet;
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
@@ -76,6 +78,7 @@ function actionAppendNewSheet({ parameters: { state } }) {
 
 function actionNewSpreadsheet({ parameters: { state } }) {
   State.restore(state);
+  // FIXME insert logic to detect change of sheet on new spreadsheet
   State.intent = Intent.CreateSpreadsheet;
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
