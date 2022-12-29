@@ -19,7 +19,10 @@ function cardLists() {
   const card = CardService.newCardBuilder()
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newTextParagraph()
-        .setText(`Choose the list that you would like to import from Blackbaud into ${State.intent == Intent.AppendSheet ? `a sheet appended to "${State.spreadsheet.getName()}"` : `a new spreadsheet`}.`)));
+        .setText(`Choose the list that you would like to import from Blackbaud into ${State.intent == Intent.AppendSheet ?
+          `a sheet appended to "${State.spreadsheet.getName()}"` :
+          `a new spreadsheet`
+          }.`)));
 
   for (const category of Object.getOwnPropertyNames(lists).sort((a, b) => {
     if (a == SORT_UNCATEGORIZED) {
@@ -27,7 +30,7 @@ function cardLists() {
     } else if (b == SORT_UNCATEGORIZED) {
       return -1;
     } else {
-      return a - b;
+      return a.localeCompare(b);
     }
   })) {
     const section = CardService.newCardSection()
@@ -36,8 +39,8 @@ function cardLists() {
       section.addWidget(CardService.newDecoratedText()
         .setText(list.name)
         .setOnClickAction(CardService.newAction()
-            .setFunctionName('actionListDetail')
-            .setParameters({ state: State.toJSON({ list })})));
+          .setFunctionName('actionListDetail')
+          .setParameters({ state: State.toJSON({ list }) })));
     }
     card.addSection(section);
   }
@@ -45,7 +48,7 @@ function cardLists() {
 }
 
 function actionListDetail({ parameters: { state } }) {
-  State.reset(state);
+  State.restore(state);
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
       .pushCard(cardListDetail()))
@@ -58,7 +61,7 @@ function cardListDetail() {
       .setTitle(State.list.name))
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newDecoratedText()
-        .setTopLabel(`${STATE.list.type} List`)
+        .setTopLabel(`${State.list.type} List`)
         .setText(State.list.description)
         .setWrapText(true))
       .addWidget(CardService.newDecoratedText()
@@ -69,46 +72,54 @@ function cardListDetail() {
         .setText(State.intent == Intent.AppendSheet ? 'Append Sheet' : 'Create Spreadsheet')
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionImportData')
-          .setParameters({state: State.toJSON()}))))
+          .setParameters({ state: State.toJSON() }))))
     .build();
 }
 
-function actionImportData({parameters: {state}}) {
-  State.reset(state);
+function actionImportData({ parameters: { state } }) {
+  State.restore(state);
   const data = SKY.school.v1.lists(State.list.id, SKY.Response.Array);
-  if (!data || data.length == 0) {
+  const dimensions = {
+    rows: data.length,
+    columns: data[0].length
+  };
+  if (!data || dimensions.columns == 0) {
     return cardEmptyList(data);
   }
   if (State.intent == Intent.AppendSheet) {
     State.sheet = State.spreadsheet.insertSheet();
-    if (State.sheet.getMaxRows() > data.length) {
-      State.sheet.deleteRows(data.length + 1, State.sheet.getMaxRows() - data.length);
+    if (State.sheet.getMaxRows() > dimensions.rows) {
+      State.sheet.deleteRows(dimensions.rows + 1, State.sheet.getMaxRows() - dimensions.rows);
     }
-    if (State.sheet.getMaxColumns() > data[0].length) {
-      State.sheet.deleteColumns(data[0].length + 1, State.sheet.getMaxColumns() - data[0].length);
+    if (State.sheet.getMaxColumns() > dimensions.columns) {
+      State.sheet.deleteColumns(dimensions.columns + 1, State.sheet.getMaxColumns() - dimensions.columns);
     }
   } else {
     State.spreadsheet = SpreadsheetApp.create(
       State.list.name,
-      data.length,
-      data[0].length
+      dimensions.rows,
+      dimensions.columns
     );
     State.sheet = State.spreadsheet.getSheets()[0];
   }
-  
-  const range = [1, 1, data.length, data[0].length];
+
+  const range = [1, 1, dimensions.rows, dimensions.columns];
   State.sheet.getRange(...range).setValues(data);
+  State.sheet.getRange(1, 1, 1, dimensions.columns).setFontWeight('bold');
+  State.sheet.setFrozenRows(1);
+  State.sheet.setName(`${State.list.name} (${new Date().toLocaleString()})`)
+
   State.sheet.addDeveloperMetadata(META_LIST, JSON.stringify(State.list));
   State.sheet.addDeveloperMetadata(META_RANGE, JSON.stringify(range));
-  State.sheet.getRange(1, 1, 1, data[0].length).setFontWeight('bold');
-  State.sheet.setFrozenRows(1);
+  State.sheet.addDeveloperMetadata(META_NAME, JSON.stringify(State.sheet.getName()));
 
   if (State.intent == Intent.AppendSheet) {
     return actionHome();
   } else {
+    const url = State.spreadsheet.getUrl();
     State.reset();
     return CardService.newActionResponseBuilder()
-      .setOpenLink(CardService.newOpenLink().setUrl(State.spreadsheet.getUrl()))
+      .setOpenLink(CardService.newOpenLink().setUrl(url))
       .setNavigation(CardService.newNavigation().popToRoot())
       .build();
   }
@@ -136,41 +147,22 @@ function cardEmptyList(data) {
     .build();
 }
 
-function actionError({parameters: {state, message}}) {
-  State.reset(state);
+function actionError({ parameters: { state, message } }) {
+  State.restore(state);
   return CardService.newActionResponseBuilder()
     .setNavigation(new CardService.newNavigation()
       .popToRoot()
       .pushCard(cardError(message)))
     .build();
 }
- 
+
 function cardError(message = "An error occurred") {
   return CardService.newCardBuilder()
     .setHeader(CardService.newCardHeader()
       .setTitle(message))
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newDecoratedText()
-        .setText(JSON.stringify({
-          folder: State.folder ? {
-            id: State.folder.getId(),
-            name: State.folder.getName()
-          } : State.folder,
-          spreadsheet: State.spreadsheet ? {
-            id: State.spreadsheet.getId(),
-            name: State.spreadsheet.getName()
-          } : State.spreadsheet,
-          sheet: State.sheet ? {
-            sheetId: State.sheet.getSheetId(),
-            name: State.sheet.getName()
-          } : State.sheet,
-          metadata: State.metadata ? {
-            list: State.metadata.list,
-            range: State.metadata.range
-          } : State.metadata,
-          list: State.list,
-          intent: Intent.serialize(State.intent)
-        }, null, 2)))
+        .setText(JSON.stringify(State.toJSON(), null, 2)))
       .addWidget(CardService.newTextButton()
         .setText('Start Over')
         .setOnClickAction(CardService.newAction()

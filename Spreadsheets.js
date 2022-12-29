@@ -13,7 +13,7 @@ function cardSpreadsheetOption() {
         .setText('Update')
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionUpdateSheet')
-          .setParameters({state: State.toJSON()}))));
+          .setParameters({ state: State.toJSON() }))));
   }
 
   return card
@@ -22,17 +22,17 @@ function cardSpreadsheetOption() {
         .setText('Append New Sheet')
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionAppendNewSheet')
-          .setParameters({state: State.toJSON()})))
+          .setParameters({ state: State.toJSON() })))
       .addWidget(CardService.newTextButton()
         .setText('New Spreadsheet')
         .setOnClickAction(CardService.newAction()
-        .setFunctionName('actionNewSpreadsheet')
-        .setParameters({state: State.toJSON()}))))
+          .setFunctionName('actionNewSpreadsheet')
+          .setParameters({ state: State.toJSON() }))))
     .build();
 }
 
-function actionUpdateSheet({parameters: {state}}) {
-  State.reset(state);
+function actionUpdateSheet({ parameters: { state } }) {
+  State.restore(state);
   const data = SKY.school.v1.lists(State.metadata.list.id, SKY.Response.Array);
   const updatedRange = [State.metadata.range[0], State.metadata.range[1], data.length, data[0].length];
   if (data.length > State.metadata.range[2]) {
@@ -43,6 +43,11 @@ function actionUpdateSheet({parameters: {state}}) {
   }
   State.sheet.getRange(...State.metadata.range).clearContent();
   State.sheet.getRange(...updatedRange).setValues(data);
+
+  if (State.sheet.getName() == State.metadata.name) {
+    State.sheet.setName(`${State.metadata.list.name} (${new Date().toLocaleString()})`);
+    State.sheet.addDeveloperMetadata(META_NAME, JSON.stringify(State.sheet.getName()));
+  }
 
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
@@ -60,8 +65,8 @@ function actionUpdateSheet({parameters: {state}}) {
     .build();
 }
 
-function actionAppendNewSheet({parameters: {state}}) {
-  State.reset(state);
+function actionAppendNewSheet({ parameters: { state } }) {
+  State.restore(state);
   State.intent = Intent.AppendSheet;
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
@@ -69,8 +74,8 @@ function actionAppendNewSheet({parameters: {state}}) {
     .build();
 }
 
-function actionNewSpreadsheet({parameters: {state}}) {
-  State.reset(state);
+function actionNewSpreadsheet({ parameters: { state } }) {
+  State.restore(state);
   State.intent = Intent.CreateSpreadsheet;
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()

@@ -6,46 +6,65 @@ const State = {
   list: null,
   intent: Intent.CreateSpreadsheet,
 
-  reset: (json = null) => {
-    const data = json && JSON.parse(json);
+  reset: (serializedState = null) => {
+    const previousState = serializedState && JSON.parse(serializedState);
 
     State.spreadsheet = SpreadsheetApp.getActiveSpreadsheet() || null;
     State.sheet = SpreadsheetApp.getActiveSheet() || null;
-    State.list = data && data.list;
-    State.intent = data && Intent.deserialize(data.intent);
+    State.list = previousState && previousState.list;
+    State.intent = previousState && Intent.deserialize(previousState.intent);
 
     State.folder = null;
-    if (data && data.folder) {
-      State.folder = DriveApp.getFolderById(data.folder);
+    if (previousState && previousState.folder) {
+      State.folder = DriveApp.getFolderById(previousState.folder);
     }
 
     State.metadata = null;
     const metadata = State.sheet && State.sheet.getDeveloperMetadata();
     if (metadata) {
-      try {
-        State.metadata = {
-          list: JSON.parse(metadata.filter(data => data.getKey() == META_LIST).shift().getValue()),
-          range: JSON.parse(metadata.filter(data => data.getKey() == META_RANGE).shift().getValue())
+      State.metadata = {};
+      for (const meta of metadata) {
+        const value = JSON.parse(meta.getValue());
+        switch (meta.getKey()) {
+          case META_LIST:
+            State.metadata.list = value;
+            break;
+          case META_RANGE:
+            State.metadata.range = value;
+            break;
+          case META_NAME:
+            State.metadata.name = value;
+            break;
         }
-      } catch (e) {}
+      }
     }
+  },
+
+  restore: (serializedState) => {
+    return State.reset(serializedState);
   },
 
   inferFolderFromLaunchEvent: (event) => {
+    State.folder = null;
     if (event.drive && event.drive && event.drive.activeCursorItem) {
       const file = DriveApp.getFileById(event.drive.activeCursorItem.id);
       const parents = file.getParents();
-      return parents.next() || null;
+      State.folder = parents.next() || null;
     }
-    return null;
   },
 
-  toJSON: (updates) => {
+  toJSON: (stateChanges) => {
     return JSON.stringify({
+      /** for debugging only -- will _not_ be deserialized */
+      spreadsheet: State.spreadsheet ? State.spreadsheet.getId() : State.spreadsheet,
+      sheet: State.sheet ? State.sheet.getSheetId() : State.sheet,
+      metadata: State.metadata,
+
+      /* actually deserialized later */
       folder: State.folder ? State.folder.getId() : State.folder,
       list: State.list,
       intent: Intent.serialize(State.intent),
-      ...updates
+      ...stateChanges
     });
   }
 }
