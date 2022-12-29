@@ -18,7 +18,8 @@
     "https://api.sky.blackbaud.com/",
     "https://docs.google.com/",
     "https://drive.google.com/",
-    "https://www.google.com/"
+    "https://www.google.com/",
+    "https://github.com/groton-school/bb-lists-to-google-sheets"
   ],
   "runtimeVersion": "V8",
   "addOns": {
