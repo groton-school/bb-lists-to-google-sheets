@@ -15,9 +15,25 @@ function cardSpreadsheetOption() {
         .setText('Update')
         .setOnClickAction(CardService.newAction()
           .setFunctionName('actionUpdateSheet')
+          .setParameters({ state: State.toJSON() })))
+      .addWidget(CardService.newTextButton()
+        .setText('Break Connection')
+        .setOnClickAction(CardService.newAction()
+          .setFunctionName('actionBreakConnection')
+          .setParameters({ state: State.toJSON() }))));
+  } else {
+    card.addSection(CardService.newCardSection()
+      .addWidget(CardService.newDecoratedText()
+        .setTopLabel(State.sheet.getName())
+        .setText(`Replace the currently selected cells (${State.sheet.getSelection().getActiveRange().getA1Notation()}) in the sheet "${State.sheet.getName()}" with data from Blackbaud`)
+        .setWrapText(true))
+      .addWidget(CardService.newTextButton()
+        .setText('Replace Selection')
+        .setOnClickAction(CardService.newAction()
+          .setMethodName('actionReplaceSelection')
           .setParameters({ state: State.toJSON() }))));
   }
-  // TODO Insert into selection (expanding area as needed)
+
   return card
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newTextButton()
@@ -31,6 +47,57 @@ function cardSpreadsheetOption() {
           .setFunctionName('actionNewSpreadsheet')
           .setParameters({ state: State.toJSON() }))))
     .setFixedFooter(fixedFooterReportIssue())
+    .build();
+}
+
+function actionBreakConnection({ parameters: { state }}) {
+  State.restore(state);
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation()
+      .pushCard(cardConfirmBreakConnection()))
+    .build();
+}
+
+function cardConfirmBreakConnection() {
+  return CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader()
+      .setTitle(`Are you sure?`))
+    .addSection(CardService.newCardSection()
+      .addWidget(CardService.newTextParagraph()
+        .setText(`You are about to remove the developer metadata that connects this sheet to its Blackbaud data source. You will no longer be able to update the data on this sheet directly from Blackbaud. You will need to select the existing data and replace it with a new import from Blackbaud if you need to get new data.`))
+      .addWidget(CardService.newTextButton()
+        .setText('Delete Metadata')
+        .setOnClickAction(CardService.newAction()
+          .setFunctionName('actionDeleteMetadata')
+          .setParameters({ state: State.toJSON() })))
+      .addWidget(CardService.newTextButton()
+        .setText('Cancel')
+        .setOnClickAction(CardService.newAction()
+          .setFunctionName('actionHome'))))
+    .build();
+}
+
+function actionDeleteMetadata({parameters: { state }}) {
+  State.restore(state);
+  for (const meta of State.sheet.getDeveloperMetadata()) {
+    switch(meta.getKey()) {
+      case META_LIST:
+      case META_NAME:
+      case META_RANGE:
+        meta.remove();
+    }
+  }
+  return actionHome();
+}
+
+function actionReplaceSelection({ parameters: { state }}) {
+  State.restore(state);
+  State.selection = State.sheet.getSelection().getActiveRange();
+  State.intent = Intent.ReplaceSelection;
+
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation()
+      .pushCard(cardLists()))
     .build();
 }
 
@@ -55,18 +122,25 @@ function actionUpdateSheet({ parameters: { state } }) {
 
   return CardService.newActionResponseBuilder()
     .setNavigation(CardService.newNavigation()
-      .pushCard(CardService.newCardBuilder()
-        .setHeader(CardService.newCardHeader()
-          .setTitle(`${State.sheet.getName()} Updated`))
-        .addSection(CardService.newCardSection()
-          .addWidget(CardService.newTextParagraph()
-            .setText(`The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${State.metadata.list.name}" in Blackbaud.`))
-          .addWidget(CardService.newTextButton()
-            .setText('Done')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('actionHome'))))
-        .setFixedFooter(fixedFooterReportIssue())
-        .build()))
+      .pushCard(cardUpdated()))
+    .build();
+}
+
+function cardUpdated() {
+  if (arguments && arguments.length > 0 && arguments[0].state) {
+    State.restore(arguments[0].state);
+  }
+  return CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader()
+      .setTitle(`${State.sheet.getName()} Updated`))
+    .addSection(CardService.newCardSection()
+      .addWidget(CardService.newTextParagraph()
+        .setText(`The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${State.metadata.list.name}" in Blackbaud.`))
+      .addWidget(CardService.newTextButton()
+        .setText('Done')
+        .setOnClickAction(CardService.newAction()
+          .setFunctionName('actionHome'))))
+    .setFixedFooter(fixedFooterReportIssue())
     .build();
 }
 

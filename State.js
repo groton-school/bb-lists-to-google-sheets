@@ -2,6 +2,7 @@ const State = {
   folder: null,
   spreadsheet: null,
   sheet: null,
+  selection: null,
   metadata: null,
   list: null,
   intent: Intent.CreateSpreadsheet,
@@ -13,6 +14,11 @@ const State = {
     State.sheet = SpreadsheetApp.getActiveSheet() || null;
     State.list = previousState && previousState.list;
     State.intent = previousState && Intent.deserialize(previousState.intent);
+
+    State.selection = null;
+    if (previousState && previousState.selection) {
+      State.selection = SpreadsheetApp.setActiveRange(State.sheet.getRange(previousState.selection));
+    }
 
     State.folder = null;
     if (previousState && previousState.folder) {
@@ -46,7 +52,7 @@ const State = {
 
   inferFolderFromLaunchEvent: (event) => {
     State.folder = null;
-    if (event.drive && event.drive && event.drive.activeCursorItem) {
+    if (event && event.drive && event.drive && event.drive.activeCursorItem) {
       const file = DriveApp.getFileById(event.drive.activeCursorItem.id);
       const parents = file.getParents();
       State.folder = parents.next() || null;
@@ -58,6 +64,7 @@ const State = {
       /** for debugging only -- will _not_ be deserialized */
       spreadsheet: State.spreadsheet ? State.spreadsheet.getId() : State.spreadsheet,
       sheet: State.sheet ? State.sheet.getSheetId() : State.sheet,
+      selection: State.selection ? State.selection.getA1Notation() : State.selection,
       metadata: State.metadata,
 
       /* actually deserialized later */
