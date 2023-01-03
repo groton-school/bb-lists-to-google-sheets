@@ -9,6 +9,8 @@ function cardSpreadsheetOption() {
         .setTopLabel(State.sheet.getName())
         .setText(`Update the data in the current sheet with the current "${State.metadata.list.name}" data from Blackbaud.`)
         .setWrapText(true))
+      .addWidget(CardService.newTextParagraph()
+        .setText('If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.'))
       .addWidget(CardService.newTextButton()
         .setText('Update')
         .setOnClickAction(CardService.newAction()
