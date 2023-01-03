@@ -82,6 +82,8 @@ function fixedFooterReportIssue() {
   return CardService.newFixedFooter()
     .setPrimaryButton(CardService.newTextButton()
       .setText("Report a Problem")
+      .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+      .setBackgroundColor('#aaaaaa')
       .setOpenLink(CardService.newOpenLink()
         .setUrl('https://github.com/groton-school/bb-lists-to-google-sheets/issues')));
 }

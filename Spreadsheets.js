@@ -15,7 +15,7 @@ function cardSpreadsheetOption() {
           .setFunctionName('actionUpdateSheet')
           .setParameters({ state: State.toJSON() }))));
   }
-
+  // TODO Insert into selection (expanding area as needed)
   return card
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newTextButton()
