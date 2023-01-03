@@ -4,6 +4,9 @@ Google Workspace Add-on to export/sync Blackbaud lists to Google Sheets
 
 # Setup
 
+Requires `Platform Manager` role on Blackbaud to access the list of lists 
+from the SKY API.
+
 Blackbaud credentials are stored as Script Properties:
 
 | Script Property     | Source                                                                                       |
