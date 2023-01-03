@@ -17,6 +17,7 @@ const SKY = {
     v1: {
       lists: (list_id = null, format = SKY.Response.JSON) => {
         if (list_id) {
+          // FIXME need to deal with pagination
           const response = SKY.call(`https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}`);
           switch (format) {
             case SKY.Response.JSON:
