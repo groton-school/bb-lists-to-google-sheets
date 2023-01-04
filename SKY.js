@@ -15,15 +15,14 @@ const SKY = {
 
   school: {
     v1: {
-      lists: (list_id = null, format = SKY.Response.JSON) => {
+      lists: (list_id = null, format = SKY.Response.JSON, page = 1) => {
         if (list_id) {
-          // FIXME need to deal with pagination
-          const response = SKY.call(`https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}`);
+          const response = SKY.call(`https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}?page=${page}`);
           switch (format) {
             case SKY.Response.JSON:
               return response.results.rows.map(row => {
                 const obj = {};
-                for ({name, value} of row.columns) {
+                for ({ name, value } of row.columns) {
                   obj[name] = value;
                 }
                 return obj;
@@ -31,12 +30,12 @@ const SKY = {
             case SKY.Response.Array:
               const array = response.results.rows.map(row => {
                 const arr = [];
-                for ({name, value} of row.columns) {
+                for ({ name, value } of row.columns) {
                   arr.push(value);
                 }
                 return arr;
               });
-              array.unshift(response.results.rows[0].columns.map(({name, value}) => name));
+              array.unshift(response.results.rows[0].columns.map(({ name, value }) => name));
               return array;
             case SKY.Response.Raw:
             default:
@@ -44,7 +43,7 @@ const SKY = {
           }
         } else {
           const response = SKY.call('https://api.sky.blackbaud.com/school/v1/lists');
-          switch(format) {
+          switch (format) {
             case SKY.Response.JSON:
               return response.value;
             case SKY.Response.Raw:
@@ -82,11 +81,11 @@ const SKY = {
       const accessToken = service.getAccessToken();
       headers[SKY.HEADER_ACCESS_KEY] = scriptProperties.getProperty(SKY.PROP_ACCESS_KEY);
       headers['Authorization'] = Utilities.formatString('Bearer %s', accessToken);
-      const response = UrlFetchApp.fetch(url, {method, headers, muteHttpExceptions: true});
+      const response = UrlFetchApp.fetch(url, { method, headers, muteHttpExceptions: true });
       const code = response.getResponseCode();
       if (code >= 200 && code < 300) {
         return JSON.parse(response.getContentText('utf-8'));
-      } else if(code == 401 || code == 403) {
+      } else if (code == 401 || code == 403) {
         maybeAuthorized = false;
       } else {
         console.error('Backend server error (%s): %s', code.toString(), resp.getContentText('utf-8'));
@@ -114,7 +113,7 @@ const SKY = {
         .addWidget(CardService.newGrid()
           .addItem(CardService.newGridItem()
             .setImage(CardService.newImageComponent()
-              .setImageUrl(URL_LOGO))))
+              .setImageUrl(App.LOGO_URL))))
         .addWidget(CardService.newTextParagraph()
           .setText('This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.')
         )
@@ -144,6 +143,6 @@ function __Sky_cardAuthorization() {
   return SKY.cardAuthorization()
 }
 
-function __Sky_callbackAuthorization (callbackRequest) {
+function __Sky_callbackAuthorization(callbackRequest) {
   return SKY.callbackAuthorization(callbackRequest);
 }
