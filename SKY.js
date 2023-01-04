@@ -20,6 +20,9 @@ const SKY = {
           const response = SKY.call(`https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}?page=${page}`);
           switch (format) {
             case SKY.Response.JSON:
+              if (response.count == 0) {
+                return [];
+              }
               return response.results.rows.map(row => {
                 const obj = {};
                 for ({ name, value } of row.columns) {
@@ -28,6 +31,9 @@ const SKY = {
                 return obj;
               });
             case SKY.Response.Array:
+              if (response.count == 0) {
+                return [];
+              }
               const array = response.results.rows.map(row => {
                 const arr = [];
                 for ({ name, value } of row.columns) {
@@ -106,16 +112,13 @@ const SKY = {
 
   cardAuthorization: () => {
     return [CardService.newCardBuilder()
-      .setHeader(CardService.newCardHeader()
-        .setTitle('Authorization Required')
-      )
+      .setHeader(TerseCardService.newCardHeader('Authorization Required'))
       .addSection(CardService.newCardSection()
         .addWidget(CardService.newGrid()
           .addItem(CardService.newGridItem()
             .setImage(CardService.newImageComponent()
               .setImageUrl(App.LOGO_URL))))
-        .addWidget(CardService.newTextParagraph()
-          .setText('This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.')
+        .addWidget(TerseCardService.newTextParagraph('This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.')
         )
         .addWidget(CardService.newButtonSet()
           .addButton(CardService.newTextButton()

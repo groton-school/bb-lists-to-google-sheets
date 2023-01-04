@@ -27,7 +27,7 @@
       "name": "Blackbaud Lists",
       "logoUrl": "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
       "homepageTrigger": {
-        "runFunction": "launch"
+        "runFunction": "__App_launch"
       }
     },
     "drive": {},

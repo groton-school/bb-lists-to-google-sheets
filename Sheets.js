@@ -1,79 +1,57 @@
+// TODO implement editor add-on to detect when active tab changes
 const Sheets = {
   META: {
-    LIST: 'org.groton.BbListsToGoogleSheets.list',
-    RANGE: 'org.groton.BbListsToGoogleSheets.range',
-    NAME: 'org.groton.BbListsToGoogleSheets.name'
+    LIST: `${App.PREFIX}.list`,
+    RANGE: `${App.PREFIX}.range`,
+    NAME: `${App.PREFIX}.name`
+  },
+
+  rangeToJSON(range) {
+    return {
+      row: range.getRow(),
+      column: range.getColumn(),
+      numRows: range.getNumRows(),
+      numColumns: range.getNumColumns(),
+      sheet: range.getSheet().getName()
+    };
+  },
+
+  rangeFromJSON(json) {
+    return State.spreadsheet
+      .getSheetByName(json.sheet)
+      .getRange(json.row, json.column, json.numRows, json.numColumns);
+  },
+
+  adjustRange({ row, column, numRows, numColumns }, range = null, sheet = null) {
+    if (range) {
+      sheet = range.getSheet();
+      if (numRows > range.getNumRows()) {
+        sheet.insertRows(range.getLastRow() + 1, numRows - range.getNumRows());
+      }
+      if (numColumns > range.getNumColumns()) {
+        sheet.insertColumns(range.getLastColumn() + 1, numColumns - range.getNumColumns());
+      }
+    } else if (sheet) {
+      if (numRows < sheet.getMaxRows()) {
+        sheet.deleteRows(numRows + 1, sheet.getMaxRows() - numRows);
+      }
+      if (numColumns < sheet.getMaxColumns()) {
+        sheet.deleteColumns(numColumns + 1, sheet.getMaxColumns() - numColumns);
+      }
+    }
+    return sheet.getRange(row, column, numRows, numColumns);
   },
 
   actions: {
-    replaceSelection({ parameters: { state } }) {
-      State.restore(state);
-      State.selection = State.sheet.getSelection().getActiveRange();
-      State.intent = Intent.ReplaceSelection;
-
-      return CardService.newActionResponseBuilder()
-        .setNavigation(CardService.newNavigation()
-          .pushCard(Lists.cards.lists()))
-        .build();
-    },
-
-    appendSheet({ parameters: { state } }) {
-      State.restore(state);
-      // FIXME insert logic to detect change of sheet on append sheet
-      State.intent = Intent.AppendSheet;
-      return CardService.newActionResponseBuilder()
-        .setNavigation(CardService.newNavigation()
-          .pushCard(Lists.cards.lists()))
-        .build();
-    },
-
-    newSpreadsheet({ parameters: { state } }) {
-      State.restore(state);
-      // FIXME insert logic to detect change of sheet on new spreadsheet
-      State.intent = Intent.CreateSpreadsheet;
-      return CardService.newActionResponseBuilder()
-        .setNavigation(CardService.newNavigation()
-          .pushCard(Lists.cards.lists()))
-        .build();
-    },
-
-    update({ parameters: { state } }) {
-      State.restore(state);
-      // FIXME insert logic to detect change of sheet on update
-      // FIXME merge with Lists.actions.insertData() logic
-      const data = SKY.school.v1.lists(State.metadata.list.id, SKY.Response.Array);
-      const updatedRange = [State.metadata.range[0], State.metadata.range[1], data.length, data[0].length];
-      if (data.length > State.metadata.range[2]) {
-        State.sheet.insertRows(State.metadata.range[0] + State.metadata.range[2], data.length - State.metadata.range[2]);
-      }
-      if (data[0].length > State.metadata.range[3]) {
-        State.sheet.insertColumns(State.metadata.range[1] + State.metadata.range[3], data[0].length - State.metadata.range[3]);
-      }
-      State.sheet.getRange(...State.metadata.range).clearContent();
-      State.sheet.getRange(...updatedRange).setValues(data);
-
-      if (State.sheet.getName() == State.metadata.name) {
-        State.sheet.setName(`${State.metadata.list.name} (${new Date().toLocaleString()})`);
-        State.sheet.addDeveloperMetadata(Sheets.META.NAME, JSON.stringify(State.sheet.getName()));
-      }
-
-      return CardService.newActionResponseBuilder()
-        .setNavigation(CardService.newNavigation()
-          .pushCard(Sheets.cards.updated()))
-        .build();
-    },
-
     spreadsheetCreated({ parameters: { state } }) {
       State.restore(state);
-      return App.actions.home({ url: State.spreadsheet.getUrl() })
+      const url = State.spreadsheet.getUrl(); // App launch will reset the State
+      return TerseCardService.replaceStack(App.launch(), url);
     },
 
     breakConnection({ parameters: { state } }) {
       State.restore(state);
-      return CardService.newActionResponseBuilder()
-        .setNavigation(CardService.newNavigation()
-          .pushCard(Sheets.cards.confirmBreakConnection()))
-        .build();
+      return TerseCardService.pushCard(Sheets.cards.confirmBreakConnection());
     },
 
     deleteMetadata({ parameters: { state } }) {
@@ -93,67 +71,80 @@ const Sheets = {
   cards: {
     options() {
       const card = CardService.newCardBuilder()
-        .setHeader(CardService.newCardHeader()
-          .setTitle(`${State.spreadsheet.getName()} Options`));
+        .setHeader(TerseCardService.newCardHeader(`${State.spreadsheet.getName()} Options`));
 
       if (State.metadata && State.metadata.list) {
         card.addSection(CardService.newCardSection()
-          .addWidget(CardService.newDecoratedText()
-            .setTopLabel(State.sheet.getName())
-            .setText(`Update the data in the current sheet with the current "${State.metadata.list.name}" data from Blackbaud.`)
-            .setWrapText(true))
-          .addWidget(CardService.newTextParagraph()
-            .setText('If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.'))
-          .addWidget(CardService.newTextButton()
-            .setText('Update')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_update')
-              .setParameters({ state: State.toJSON() })))
-          .addWidget(CardService.newTextButton()
-            .setText('Break Connection')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_breakConnection')
-              .setParameters({ state: State.toJSON() }))));
+          .addWidget(TerseCardService.newDecoratedText(
+            State.sheet.getName(),
+            `Update the data in the current sheet with the current "${State.metadata.list.name}" data from Blackbaud.`
+          ))
+          .addWidget(TerseCardService.newTextParagraph(
+            'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.'
+          ))
+          .addWidget(TerseCardService.newTextButton('Update', '__Lists_actions_importData', {
+            intent: Intent.UpdateExisting,
+            list: State.metadata.list
+          }))
+          .addWidget(TerseCardService.newTextButton(
+            'Break Connection',
+            '__Sheets_actions_breakConnection'
+          )));
       } else {
         card.addSection(CardService.newCardSection()
-          .addWidget(CardService.newDecoratedText()
-            .setTopLabel(State.sheet.getName())
-            .setText(`Replace the currently selected cells (${State.sheet.getSelection().getActiveRange().getA1Notation()}) in the sheet "${State.sheet.getName()}" with data from Blackbaud`)
-            .setWrapText(true))
-          .addWidget(CardService.newTextButton()
-            .setText('Replace Selection')
-            .setOnClickAction(CardService.newAction()
-              .setMethodName('__Sheets_actions_replaceSelection')
-              .setParameters({ state: State.toJSON() }))));
+          .addWidget(TerseCardService.newDecoratedText(
+            State.sheet.getName(),
+            `Replace the currently selected cells (${State.sheet.getSelection().getActiveRange().getA1Notation()}) in the sheet "${State.sheet.getName()}" with data from Blackbaud`
+          ))
+          .addWidget(TerseCardService.newTextButton(
+            'Replace Selection',
+            '__Lists_actions_lists',
+            {
+              intent: Intent.ReplaceSelection,
+              selection: State.sheet.getSelection().getActiveRange()
+            }
+          ))
+        );
       }
 
       return card
         .addSection(CardService.newCardSection()
-          .addWidget(CardService.newTextButton()
-            .setText('Append New Sheet')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_appendSheet')
-              .setParameters({ state: State.toJSON() })))
-          .addWidget(CardService.newTextButton()
-            .setText('New Spreadsheet')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_newSpreadsheet')
-              .setParameters({ state: State.toJSON() }))))
+          .addWidget(TerseCardService.newTextButton(
+            'Append New Sheet',
+            '__Lists_actions_lists',
+            { intent: Intent.AppendSheet }
+          ))
+          .addWidget(TerseCardService.newTextButton(
+            'New Spreadsheet',
+            '__Lists_actions_lists',
+            { intent: Intent.CreateSpreadsheet }
+          ))
+        )
+        .build();
+    },
+
+    sheetAppended() {
+      return CardService.newCardBuilder()
+        .setHeader(TerseCardService.newCardHeader(State.sheet.getName()))
+        .addSection(CardService.newCardSection()
+          .addWidget(TerseCardService.newTextParagraph(
+            `The sheet "${State.sheet.getName()}" has been appended to "${State.spreadsheet.getName()}" and populated with the data in "${State.list.name}" from Blackbaud.`
+          ))
+          .addWidget(TerseCardService.newTextButton('Done', '__App_actions_home')))
         .build();
     },
 
     spreadsheetCreated() {
       return CardService.newCardBuilder()
-        .setHeader(CardService.newCardHeader()
-          .setTitle(State.spreadsheet.getName()))
+        .setHeader(TerseCardService.newCardHeader(State.spreadsheet.getName()))
         .addSection(CardService.newCardSection()
-          .addWidget(CardService.newTextParagraph()
-            .setText(`The spreadsheet "${State.spreadsheet.getName()}"" has been created in the folder "${State.folder.getName()}" and populated with the data in "${State.list.name}" from Blackbaud.`))
-          .addWidget(CardService.newTextButton()
-            .setText('Open Spreadsheet')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_newSpreadsheet')
-              .setParameters({ state: State.toJSON() }))))
+          .addWidget(TerseCardService.newTextParagraph(
+            `The spreadsheet "${State.spreadsheet.getName()}" has been created in ${State.folder ? `the folder "${State.folder.getName()}"` : "your My Drive"} and populated with the data in "${State.list.name}" from Blackbaud.`
+          ))
+          .addWidget(TerseCardService.newTextButton(
+            'Open Spreadsheet',
+            '__Sheets_actions_spreadsheetCreated'
+          )))
         .build();
     },
 
@@ -162,49 +153,23 @@ const Sheets = {
         State.restore(arguments[0].state);
       }
       return CardService.newCardBuilder()
-        .setHeader(CardService.newCardHeader()
-          .setTitle(`${State.sheet.getName()} Updated`))
+        .setHeader(TerseCardService.newCardHeader(`${State.sheet.getName()} Updated`))
         .addSection(CardService.newCardSection()
-          .addWidget(CardService.newTextParagraph()
-            .setText(`The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${State.metadata.list.name}" in Blackbaud.`))
-          .addWidget(CardService.newTextButton()
-            .setText('Done')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__App_actions_home'))))
+          .addWidget(TerseCardService.newTextParagraph(`The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${State.metadata.list.name}" in Blackbaud.`))
+          .addWidget(TerseCardService.newTextButton('Done', '__App_actions_home')))
         .build();
     },
 
     confirmBreakConnection() {
       return CardService.newCardBuilder()
-        .setHeader(CardService.newCardHeader()
-          .setTitle(`Are you sure?`))
+        .setHeader(TerseCardService.newCardHeader(`Are you sure?`))
         .addSection(CardService.newCardSection()
-          .addWidget(CardService.newTextParagraph()
-            .setText(`You are about to remove the developer metadata that connects this sheet to its Blackbaud data source. You will no longer be able to update the data on this sheet directly from Blackbaud. You will need to select the existing data and replace it with a new import from Blackbaud if you need to get new data.`))
-          .addWidget(CardService.newTextButton()
-            .setText('Delete Metadata')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__Sheets_actions_deleteMetadata')
-              .setParameters({ state: State.toJSON() })))
-          .addWidget(CardService.newTextButton()
-            .setText('Cancel')
-            .setOnClickAction(CardService.newAction()
-              .setFunctionName('__App_actions_home'))))
+          .addWidget(TerseCardService.newTextParagraph(`You are about to remove the developer metadata that connects this sheet to its Blackbaud data source. You will no longer be able to update the data on this sheet directly from Blackbaud. You will need to select the existing data and replace it with a new import from Blackbaud if you need to get new data.`))
+          .addWidget(TerseCardService.newTextButton('Delete Metadata', '__Sheets_actions_deleteMetadata'))
+          .addWidget(TerseCardService.newTextButton('Cancel', '__App_actions_home')))
         .build();
     }
   }
-}
-
-function __Sheets_actions_replaceSelection(...args) {
-  return Sheets.actions.replaceSelection(...args);
-}
-
-function __Sheets_actions_appendSheet(...args) {
-  return Sheets.actions.appendSheet(...args);
-}
-
-function __Sheets_actions_newSpreadsheet(...args) {
-  return Sheets.actions.newSpreadsheet(...args);
 }
 
 function __Sheets_actions_update(...args) {
