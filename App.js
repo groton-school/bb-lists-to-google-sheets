@@ -1,6 +1,7 @@
 const App = {
   PREFIX: 'org.groton.BbListsToGoogleSheets',
-  LOGO_URL: 'https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0',
+  LOGO_URL:
+    'https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0',
 
   launch(event) {
     if (event) {
@@ -16,7 +17,7 @@ const App = {
     home({ parameters: { state } }) {
       State.reset(state);
       return TerseCardService.replaceStack(App.cards.home());
-    }
+    },
   },
 
   cards: {
@@ -28,16 +29,32 @@ const App = {
       }
     },
 
-    error(message = "An error occurred") {
+    error(message = 'An error occurred') {
       return CardService.newCardBuilder()
         .setHeader(TerseCardService.newCardHeader(message))
-        .addSection(CardService.newCardSection()
-          .addWidget(TerseCardService.newDecoratedText('State', JSON.stringify(JSON.parse(State.toJSON()), null, 2)))
-          .addWidget(TerseCardService.newTextButton('Start Over', '__App_actions_home')))
+        .addSection(
+          CardService.newCardSection()
+            .addWidget(
+              TerseCardService.newDecoratedText(
+                'State',
+                JSON.stringify(
+                  JSON.parse(State.toJSON()),
+                  null,
+                  2
+                )
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextButton(
+                'Start Over',
+                '__App_actions_home'
+              )
+            )
+        )
         .build();
-    }
-  }
-}
+    },
+  },
+};
 
 function __App_launch(e) {
   return App.launch(e);

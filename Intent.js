@@ -4,7 +4,7 @@ const Intent = {
   ReplaceSelection: Symbol('replace'),
   UpdateExisting: Symbol('update'),
 
-  serialize: (sym) => {
+  serialize: sym => {
     switch (sym) {
       case Intent.CreateSpreadsheet:
         return 'create';
@@ -18,7 +18,7 @@ const Intent = {
         return null;
     }
   },
-  deserialize: (str) => {
+  deserialize: str => {
     switch (str) {
       case 'create':
         return Intent.CreateSpreadsheet;
@@ -31,5 +31,5 @@ const Intent = {
       default:
         return null;
     }
-  }
-}
+  },
+};

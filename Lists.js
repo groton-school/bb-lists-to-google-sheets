@@ -3,8 +3,8 @@ const Lists = {
   BLACKBAUD_PAGE_SIZE: 1000,
 
   setSheetName(sheet) {
-    sheet.setName(`${State.list.name} (${new Date().toLocaleString()})`)
-    sheet.addDeveloperMetadata(Sheets.META.NAME, sheet.getName());
+    sheet.setName(`${State.list.name} (${new Date().toLocaleString()})`);
+    Sheets.metadata.set(Sheets.metadata.NAME, sheet.getName(), sheet);
   },
 
   actions: {
@@ -21,23 +21,36 @@ const Lists = {
     importData({ parameters: { state } }) {
       State.restore(state);
       State.data = SKY.school.v1.lists(State.list.id, SKY.Response.Array);
-      if (State.data.length == Lists.BLACKBAUD_PAGE_SIZE + 1 /* column labels */) {
+      if (
+        State.data.length ==
+        Lists.BLACKBAUD_PAGE_SIZE + 1 /* column labels */
+      ) {
         State.page = 1;
-        return TerseCardService.replaceStack(Lists.cards.loadNextPage());
+        return TerseCardService.replaceStack(
+          Lists.cards.loadNextPage()
+        );
       } else {
-        return Lists.actions.insertData({ parameters: { state: State.toJSON() } });
+        return Lists.actions.insertData({
+          parameters: { state: State.toJSON() },
+        });
       }
     },
 
     loadNextPage({ parameters: { state } }) {
       State.restore(state);
       State.page++;
-      const data = SKY.school.v1.lists(State.list.id, SKY.Response.Array, State.page).slice(1); // trim off unneeded column labels
+      const data = SKY.school.v1
+        .lists(State.list.id, SKY.Response.Array, State.page)
+        .slice(1); // trim off unneeded column labels
       State.data.push(...data);
       if (data.length == Lists.BLACKBAUD_PAGE_SIZE) {
-        return TerseCardService.replaceStack(Lists.cards.loadNextPage());
+        return TerseCardService.replaceStack(
+          Lists.cards.loadNextPage()
+        );
       } else {
-        return Lists.actions.insertData({ parameters: { state: State.toJSON() } });
+        return Lists.actions.insertData({
+          parameters: { state: State.toJSON() },
+        });
       }
     },
 
@@ -58,7 +71,7 @@ const Lists = {
               row: 1,
               column: 1,
               numRows: data.length,
-              numColumns: data[0].length
+              numColumns: data[0].length,
             },
             null,
             State.sheet
@@ -71,20 +84,22 @@ const Lists = {
               row: State.selection.getRow(),
               column: State.selection.getColumn(),
               numRows: data.length,
-              numColumns: data[0].length
+              numColumns: data[0].length,
             },
             State.selection
           );
           break;
         case Intent.UpdateExisting:
+          const metaRange = Sheets.metadata.get(
+            Sheets.metadata.RANGE
+          );
           range = Sheets.adjustRange(
             {
-              row: State.metadata.range.row,
-              column: State.metadata.range.column,
+              ...metaRange,
               numRows: data.length,
-              numColumns: data[0].length
+              numColumns: data[0].length,
             },
-            Sheets.rangeFromJSON(State.metadata.range)
+            Sheets.rangeFromJSON(metaRange)
           );
           break;
         case Intent.CreateSpreadsheet:
@@ -95,47 +110,74 @@ const Lists = {
             data[0].length
           );
           if (State.folder) {
-            DriveApp.getFileById(State.spreadsheet.getId()).moveTo(State.folder);
+            DriveApp.getFileById(State.spreadsheet.getId()).moveTo(
+              State.folder
+            );
           }
           State.sheet = State.spreadsheet.getSheets()[0];
-          range = State.sheet.getRange(1, 1, data.length, data[0].length);
+          range = State.sheet.getRange(
+            1,
+            1,
+            data.length,
+            data[0].length
+          );
       }
 
       range.setValues(data);
       range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
 
-      range.getSheet().addDeveloperMetadata(Sheets.META.LIST, JSON.stringify(State.list));
-      range.getSheet().addDeveloperMetadata(Sheets.META.RANGE, JSON.stringify(Sheets.rangeToJSON(range)));
+      Sheets.metadata.set(
+        Sheets.metadata.LIST,
+        State.list,
+        range.getSheet()
+      );
+      Sheets.metadata.set(
+        Sheets.metadata.RANGE,
+        Sheets.rangeToJSON(range),
+        range.getSheet()
+      );
 
       switch (State.intent) {
         case Intent.ReplaceSelection:
-          range.getSheet().addDeveloperMetadata(Sheets.META.NAME, `${State.sheet.getName()}-existing`);
-          State.resyncMetadata();
-          return TerseCardService.replaceStack(Sheets.cards.updated());
+          Sheets.metadata.set(
+            Sheets.metadata.NAME,
+            `${range.getSheet().getName()}-existing`,
+            range.getSheet()
+          );
+          return TerseCardService.replaceStack(
+            Sheets.cards.updated()
+          );
         case Intent.UpdateExisting:
-          if (range.getSheet().getName() == State.metadata.name) {
+          if (
+            range.getSheet().getName() ==
+            Sheets.metadata.get(Sheets.metadata.NAME)
+          ) {
             Lists.setSheetName(range.getSheet());
           }
-          State.resyncMetadata();
-          return TerseCardService.replaceStack(Sheets.cards.updated());
+          return TerseCardService.replaceStack(
+            Sheets.cards.updated()
+          );
         case Intent.AppendSheet:
+          range.getSheet().setFrozenRows(1);
+          Lists.setSheetName(range.getSheet());
+          // TODO why isn't the appended sheet made active?
+          State.spreadsheet.setActiveSheet(range.getSheet());
+          return TerseCardService.replaceStack(
+            Sheets.cards.sheetAppended()
+          );
         case Intent.CreateSpreadsheet:
         default:
           range.getSheet().setFrozenRows(1);
           Lists.setSheetName(range.getSheet());
-          State.resyncMetadata();
-          if (State.intent == Intent.AppendSheet) {
-            State.spreadsheet.setActiveSheet(range.getSheet());
-            return TerseCardService.replaceStack(Sheets.cards.sheetAppended());
-          } else {
-            return TerseCardService.replaceStack(Sheets.cards.spreadsheetCreated());
-          }
+          return TerseCardService.replaceStack(
+            Sheets.cards.spreadsheetCreated()
+          );
       }
     },
 
     emptyList(data) {
       return TerseCardService.replaceStack(Lists.cards.emptyList(data));
-    }
+    },
   },
 
   cards: {
@@ -152,7 +194,9 @@ const Lists = {
         }
         return categories;
       };
-      const lists = SKY.school.v1.lists().reduce(groupCategories, { [Lists.UNCATEGORIZED]: [] });
+      const lists = SKY.school.v1
+        .lists()
+        .reduce(groupCategories, { [Lists.UNCATEGORIZED]: [] });
 
       var intentBasedActionDescription;
       switch (State.intent) {
@@ -167,12 +211,13 @@ const Lists = {
           intentBasedActionDescription = 'a new spreadsheet';
       }
 
-      const card = CardService.newCardBuilder()
-        .addSection(CardService.newCardSection()
-          .addWidget(TerseCardService.newTextParagraph(
+      const card = CardService.newCardBuilder().addSection(
+        CardService.newCardSection().addWidget(
+          TerseCardService.newTextParagraph(
             `Choose the list that you would like to import from Blackbaud into ${intentBasedActionDescription}.`
-          ))
-        );
+          )
+        )
+      );
 
       const sortCategoriesWithUncategorizedLast = (a, b) => {
         if (a == Lists.UNCATEGORIZED) {
@@ -184,12 +229,24 @@ const Lists = {
         }
       };
 
-      for (const category of Object.getOwnPropertyNames(lists).sort(sortCategoriesWithUncategorizedLast)) {
-        const section = CardService.newCardSection()
-          .setHeader(category == Lists.UNCATEGORIZED ? 'Uncategorized' : category);
+      for (const category of Object.getOwnPropertyNames(lists).sort(
+        sortCategoriesWithUncategorizedLast
+      )) {
+        const section = CardService.newCardSection().setHeader(
+          category == Lists.UNCATEGORIZED ? 'Uncategorized' : category
+        );
         for (const list of lists[category]) {
-          section.addWidget(TerseCardService.newDecoratedText(null, list.name)
-            .setOnClickAction(TerseCardService.newAction('__Lists_actions_listDetail', { list })));
+          section.addWidget(
+            TerseCardService.newDecoratedText(
+              null,
+              list.name
+            ).setOnClickAction(
+              TerseCardService.newAction(
+                '__Lists_actions_listDetail',
+                { list }
+              )
+            )
+          );
         }
         card.addSection(section);
       }
@@ -209,20 +266,31 @@ const Lists = {
 
       return CardService.newCardBuilder()
         .setHeader(TerseCardService.newCardHeader(State.list.name))
-        .addSection(CardService.newCardSection()
-          .addWidget(TerseCardService.newDecoratedText(
-            `${State.list.type} List`,
-            State.list.description
-          ))
-          .addWidget(TerseCardService.newDecoratedText(
-            `Created by ${State.list.created_by} ${new Date(State.list.created).toLocaleString()}`,
-            null,
-            `Last modified ${new Date(State.list.last_modified).toLocaleString()}`
-          ))
-          .addWidget(TerseCardService.newTextButton(
-            buttonNameBasedOnIntent,
-            '__Lists_actions_importData'
-          ))
+        .addSection(
+          CardService.newCardSection()
+            .addWidget(
+              TerseCardService.newDecoratedText(
+                `${State.list.type} List`,
+                State.list.description
+              )
+            )
+            .addWidget(
+              TerseCardService.newDecoratedText(
+                `Created by ${State.list.created_by} ${new Date(
+                  State.list.created
+                ).toLocaleString()}`,
+                null,
+                `Last modified ${new Date(
+                  State.list.last_modified
+                ).toLocaleString()}`
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextButton(
+                buttonNameBasedOnIntent,
+                '__Lists_actions_importData'
+              )
+            )
         )
         .build();
     },
@@ -230,17 +298,26 @@ const Lists = {
     loadNextPage() {
       return CardService.newCardBuilder()
         .setHeader(TerseCardService.newCardHeader(State.list.name))
-        .addSection(CardService.newCardSection()
-          .addWidget(TerseCardService.newTextParagraph(
-            'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts'
-          ))
-          .addWidget(TerseCardService.newTextParagraph(
-            `${State.data.length - 1} records have been loaded from "${State.list.name}" so far.`
-          ))
-          .addWidget(TerseCardService.newTextButton(
-            `Load Page ${State.page + 1}`,
-            '__Lists_actions_loadNextPage'
-          ))
+        .addSection(
+          CardService.newCardSection()
+            .addWidget(
+              TerseCardService.newTextParagraph(
+                'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts'
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextParagraph(
+                `${State.data.length - 1
+                } records have been loaded from "${State.list.name
+                }" so far.`
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextButton(
+                `Load Page ${State.page + 1}`,
+                '__Lists_actions_loadNextPage'
+              )
+            )
         )
         .build();
     },
@@ -248,22 +325,34 @@ const Lists = {
     emptyList(data) {
       return CardService.newCardBuilder()
         .setHeader(TerseCardService.newCardHeader(State.list.name))
-        .addSection(CardService.newCardSection()
-          .addWidget(TerseCardService.newTextParagraph(JSON.stringify(State.list, null, 2)))
-          .addWidget(TerseCardService.newTextParagraph(JSON.stringify(data, null, 2)))
-          .addWidget(TerseCardService.newTextParagraph(
-            `No data was returned in the list "${State.list.name}" so no sheet was created.`
-          ))
-          .addWidget(TerseCardService.newTextButton(
-            'Try Another List',
-            '__App_actions_home'
-          ))
+        .addSection(
+          CardService.newCardSection()
+            .addWidget(
+              TerseCardService.newTextParagraph(
+                JSON.stringify(State.list, null, 2)
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextParagraph(
+                JSON.stringify(data, null, 2)
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextParagraph(
+                `No data was returned in the list "${State.list.name}" so no sheet was created.`
+              )
+            )
+            .addWidget(
+              TerseCardService.newTextButton(
+                'Try Another List',
+                '__App_actions_home'
+              )
+            )
         )
         .build();
-    }
-
-  }
-}
+    },
+  },
+};
 
 function __Lists_actions_lists(...args) {
   return Lists.actions.lists(...args);

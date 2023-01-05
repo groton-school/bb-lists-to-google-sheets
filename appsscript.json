@@ -1,36 +1,38 @@
 {
-  "timeZone": "America/New_York",
-  "dependencies": {
-    "libraries": [{
-      "userSymbol": "OAuth2",
-      "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
-      "version": "43"
-    }]
-  },
-  "exceptionLogging": "STACKDRIVER",
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-  ],
-  "urlFetchWhitelist": [
-    "https://oauth2.sky.blackbaud.com/",
-    "https://api.sky.blackbaud.com/",
-    "https://docs.google.com/",
-    "https://drive.google.com/",
-    "https://www.google.com/",
-    "https://github.com/groton-school/bb-lists-to-google-sheets"
-  ],
-  "runtimeVersion": "V8",
-  "addOns": {
-    "common": {
-      "name": "Blackbaud Lists",
-      "logoUrl": "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
-      "homepageTrigger": {
-        "runFunction": "__App_launch"
-      }
+    "timeZone": "America/New_York",
+    "dependencies": {
+        "libraries": [
+            {
+                "userSymbol": "OAuth2",
+                "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
+                "version": "43"
+            }
+        ]
     },
-    "drive": {},
-    "sheets": {}
-  }
+    "exceptionLogging": "STACKDRIVER",
+    "oauthScopes": [
+        "https://www.googleapis.com/auth/script.external_request",
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ],
+    "urlFetchWhitelist": [
+        "https://oauth2.sky.blackbaud.com/",
+        "https://api.sky.blackbaud.com/",
+        "https://docs.google.com/",
+        "https://drive.google.com/",
+        "https://www.google.com/",
+        "https://github.com/groton-school/bb-lists-to-google-sheets"
+    ],
+    "runtimeVersion": "V8",
+    "addOns": {
+        "common": {
+            "name": "Blackbaud Lists",
+            "logoUrl": "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+            "homepageTrigger": {
+                "runFunction": "__App_launch"
+            }
+        },
+        "drive": {},
+        "sheets": {}
+    }
 }
