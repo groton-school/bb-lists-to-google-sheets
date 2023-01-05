@@ -59,7 +59,9 @@ const Lists = {
       const data = State.data;
 
       if (!data || data.length == 0) {
-        return Lists.actions.emptyList(data);
+        return Lists.actions.emptyList(
+          SKY.school.v1.lists(State.list.id, SKY.Response.Raw)
+        );
       }
 
       var range = null;
@@ -109,6 +111,7 @@ const Lists = {
             data.length,
             data[0].length
           );
+          // FIXME ...and we're back to not moving the spreadsheet to the current folder, again
           if (State.folder) {
             DriveApp.getFileById(State.spreadsheet.getId()).moveTo(
               State.folder
