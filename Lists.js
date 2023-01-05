@@ -129,6 +129,7 @@ const Lists = {
       range.setValues(data);
       range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
 
+      // TODO add a user-visible comment noting last update timestamp
       Sheets.metadata.set(
         Sheets.metadata.LIST,
         State.list,
