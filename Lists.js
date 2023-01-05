@@ -2,8 +2,10 @@ const Lists = {
   UNCATEGORIZED: `${App.PREFIX}.Lists.uncategorized`,
   BLACKBAUD_PAGE_SIZE: 1000,
 
-  setSheetName(sheet) {
-    sheet.setName(`${State.list.name} (${new Date().toLocaleString()})`);
+  setSheetName(sheet, timestamp = null) {
+    sheet.setName(
+      `${State.list.name} (${timestamp || new Date().toLocaleString()})`
+    );
     Sheets.metadata.set(Sheets.metadata.NAME, sheet.getName(), sheet);
   },
 
@@ -128,8 +130,8 @@ const Lists = {
 
       range.setValues(data);
       range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
+      const timestamp = new Date().toLocaleString();
 
-      // TODO add a user-visible comment noting last update timestamp
       Sheets.metadata.set(
         Sheets.metadata.LIST,
         State.list,
@@ -140,6 +142,14 @@ const Lists = {
         Sheets.rangeToJSON(range),
         range.getSheet()
       );
+      Sheets.metadata.set(
+        Sheets.metadata.LAST_UPDATED,
+        timestamp,
+        range.getSheet()
+      );
+      range
+        .offset(0, 0, 1, 1)
+        .setNote(`Last updated from "${State.list.name}" ${timestamp}`);
 
       switch (State.intent) {
         case Intent.ReplaceSelection:
@@ -163,7 +173,7 @@ const Lists = {
           );
         case Intent.AppendSheet:
           range.getSheet().setFrozenRows(1);
-          Lists.setSheetName(range.getSheet());
+          Lists.setSheetName(range.getSheet(), timestamp);
           // TODO why isn't the appended sheet made active?
           State.spreadsheet.setActiveSheet(range.getSheet());
           return TerseCardService.replaceStack(
@@ -172,7 +182,7 @@ const Lists = {
         case Intent.CreateSpreadsheet:
         default:
           range.getSheet().setFrozenRows(1);
-          Lists.setSheetName(range.getSheet());
+          Lists.setSheetName(range.getSheet(), timestamp);
           return TerseCardService.replaceStack(
             Sheets.cards.spreadsheetCreated()
           );

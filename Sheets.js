@@ -4,6 +4,7 @@ const Sheets = {
     LIST: `${App.PREFIX}.list`,
     RANGE: `${App.PREFIX}.range`,
     NAME: `${App.PREFIX}.name`,
+    LAST_UPDATED: `${App.PREFIX}.lastUpdated`,
 
     get(key, sheet = null) {
       sheet = sheet || State.sheet;
@@ -331,6 +332,10 @@ const Sheets = {
                     [Sheets.metadata.NAME]:
                       Sheets.metadata.get(
                         Sheets.metadata.NAME
+                      ),
+                    [Sheets.metadata.LAST_UPDATED]:
+                      Sheets.metadata.get(
+                        Sheets.metadata.LAST_UPDATED
                       ),
                   },
                   null,
