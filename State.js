@@ -9,6 +9,7 @@ const State = {
   intent: Intent.CreateSpreadsheet,
 
   reset: (serializedState = null) => {
+    // TODO reduce unnecessary rehydration -- only do so on demand, as-needed
     const previousState = serializedState && JSON.parse(serializedState);
 
     if (previousState && previousState.spreadsheet) {

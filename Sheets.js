@@ -145,14 +145,14 @@ const Sheets = {
         )
       );
 
-      const metaName = Sheets.metadata.get(Sheets.metadata.NAME);
-      if (metaName) {
+      const metaList = Sheets.metadata.get(Sheets.metadata.LIST);
+      if (metaList) {
         card.addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newDecoratedText(
                 State.sheet.getName(),
-                `Update the data in the current sheet with the current "${metaName}" data from Blackbaud.`
+                `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`
               )
             )
             .addWidget(
