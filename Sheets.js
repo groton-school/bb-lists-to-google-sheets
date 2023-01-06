@@ -126,14 +126,10 @@ const Sheets = {
 
     deleteMetadata({ parameters: { state } }) {
       State.restore(state);
-      for (const meta of State.sheet.getDeveloperMetadata()) {
-        switch (meta.getKey()) {
-          case Sheets.META.LIST:
-          case Sheets.META.NAME:
-          case Sheets.META.RANGE:
-            meta.remove();
-        }
-      }
+      Sheets.metadata.delete(Sheets.metadata.LIST);
+      Sheets.metadata.delete(Sheets.metadata.RANGE);
+      Sheets.metadata.delete(Sheets.metadata.NAME);
+      Sheets.metadata.delete(Sheets.metadata.LAST_UPDATED);
       return App.actions.home();
     },
   },
@@ -153,7 +149,11 @@ const Sheets = {
             .addWidget(
               TerseCardService.newDecoratedText(
                 State.sheet.getName(),
-                `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`
+                `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
+                `Last updated ${Sheets.metadata.get(
+                  Sheets.metadata.LAST_UPDATED
+                ) || 'at an unknown time'
+                }`
               )
             )
             .addWidget(
@@ -294,9 +294,9 @@ const Sheets = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${Sheets.metadata.get(
-                  Sheets.metadata.NAME
-                )}" in Blackbaud.`
+                `The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST)
+                  .name
+                }" in Blackbaud.`
               )
             )
             .addWidget(
