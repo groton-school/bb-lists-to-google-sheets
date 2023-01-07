@@ -7,7 +7,7 @@ const Sheets = {
     LAST_UPDATED: `${App.PREFIX}.lastUpdated`,
 
     get(key, sheet = null) {
-      sheet = sheet || State.sheet;
+      sheet = sheet || State.getSheet();
       const meta = sheet
         .createDeveloperMetadataFinder()
         .withKey(key)
@@ -24,7 +24,7 @@ const Sheets = {
     },
 
     set(key, value, sheet = null) {
-      sheet = sheet || State.sheet;
+      sheet = sheet || State.getSheet();
       str = JSON.stringify(value);
       const meta = sheet
         .createDeveloperMetadataFinder()
@@ -38,7 +38,7 @@ const Sheets = {
     },
 
     delete(key, sheet = null) {
-      sheet = sheet || State.sheet;
+      sheet = sheet || State.getSheet();
       const meta = sheet
         .createDeveloperMetadataFinder()
         .withKey(key)
@@ -63,7 +63,8 @@ const Sheets = {
   rangeFromJSON(json) {
     // FIXME this fallback is unsafe without tracking tab changes!
     const sheet =
-      State.spreadsheet.getSheetByName(json.sheet) || State.sheet;
+      State.getSpreadsheet().getSheetByName(json.sheet) ||
+      State.getSheet();
     return sheet.getRange(
       json.row,
       json.column,
@@ -108,7 +109,7 @@ const Sheets = {
   actions: {
     spreadsheetCreated({ parameters: { state } }) {
       State.restore(state);
-      const url = State.spreadsheet.getUrl(); // App launch will reset the State
+      const url = State.getSpreadsheet().getUrl(); // App launch will reset the State
       return TerseCardService.replaceStack(App.launch(), url);
     },
 
@@ -138,7 +139,7 @@ const Sheets = {
     options() {
       const card = CardService.newCardBuilder().setHeader(
         TerseCardService.newCardHeader(
-          `${State.spreadsheet.getName()} Options`
+          `${State.getSpreadsheet().getName()} Options`
         )
       );
 
@@ -148,7 +149,7 @@ const Sheets = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newDecoratedText(
-                State.sheet.getName(),
+                State.getSheet().getName(),
                 `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
                 `Last updated ${Sheets.metadata.get(
                   Sheets.metadata.LAST_UPDATED
@@ -191,11 +192,11 @@ const Sheets = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newDecoratedText(
-                State.sheet.getName(),
-                `Replace the currently selected cells (${State.sheet
+                State.getSheet().getName(),
+                `Replace the currently selected cells (${State.getSheet()
                   .getSelection()
                   .getActiveRange()
-                  .getA1Notation()}) in the sheet "${State.sheet.getName()}" with data from Blackbaud`
+                  .getA1Notation()}) in the sheet "${State.getSheet().getName()}" with data from Blackbaud`
               )
             )
             .addWidget(
@@ -204,7 +205,7 @@ const Sheets = {
                 '__Lists_actions_lists',
                 {
                   intent: Intent.ReplaceSelection,
-                  selection: State.sheet
+                  selection: State.getSheet()
                     .getSelection()
                     .getActiveRange(),
                 }
@@ -235,13 +236,13 @@ const Sheets = {
     sheetAppended() {
       return CardService.newCardBuilder()
         .setHeader(
-          TerseCardService.newCardHeader(State.sheet.getName())
+          TerseCardService.newCardHeader(State.getSheet().getName())
         )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The sheet "${State.sheet.getName()}" has been appended to "${State.spreadsheet.getName()}" and populated with the data in "${State.list.name
+                `The sheet "${State.getSheet().getName()}" has been appended to "${State.getSpreadsheet().getName()}" and populated with the data in "${State.getList().name
                 }" from Blackbaud.`
               )
             )
@@ -257,16 +258,18 @@ const Sheets = {
     spreadsheetCreated() {
       return CardService.newCardBuilder()
         .setHeader(
-          TerseCardService.newCardHeader(State.spreadsheet.getName())
+          TerseCardService.newCardHeader(
+            State.getSpreadsheet().getName()
+          )
         )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The spreadsheet "${State.spreadsheet.getName()}" has been created in ${State.folder
-                  ? `the folder "${State.folder.getName()}"`
+                `The spreadsheet "${State.getSpreadsheet().getName()}" has been created in ${State.getFolder()
+                  ? `the folder "${State.getFolder().folder.getName()}"`
                   : 'your My Drive'
-                } and populated with the data in "${State.list.name
+                } and populated with the data in "${State.getList().name
                 }" from Blackbaud.`
               )
             )
@@ -287,14 +290,14 @@ const Sheets = {
       return CardService.newCardBuilder()
         .setHeader(
           TerseCardService.newCardHeader(
-            `${State.sheet.getName()} Updated`
+            `${State.getSheet().getName()} Updated`
           )
         )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The sheet "${State.sheet.getName()}" of "${State.spreadsheet.getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST)
+                `The sheet "${State.getSheet().getName()}" of "${State.getSpreadsheet().getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST)
                   .name
                 }" in Blackbaud.`
               )
@@ -312,13 +315,13 @@ const Sheets = {
     showMetadata() {
       return CardService.newCardBuilder()
         .setHeader(
-          TerseCardService.newCardHeader(State.sheet.getName())
+          TerseCardService.newCardHeader(State.getSheet().getName())
         )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newDecoratedText(
-                `${State.sheet.getName()} Deeloper Metadata`,
+                `${State.getSheet().getName()} Deeloper Metadata`,
                 JSON.stringify(
                   {
                     [Sheets.metadata.LIST]:

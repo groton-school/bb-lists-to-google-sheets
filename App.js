@@ -8,7 +8,7 @@ const App = {
       App.launchEvent = event;
     }
     State.reset();
-    State.folder = Drive.inferFolder(App.launchEvent);
+    State.setFolder(Drive.inferFolder(App.launchEvent));
     // TODO can also infer folder from parent of current spreadsheet
     return App.cards.home();
   },
@@ -22,7 +22,7 @@ const App = {
 
   cards: {
     home() {
-      if (State.sheet) {
+      if (State.getSpreadsheet()) {
         return Sheets.cards.options();
       } else {
         return Lists.cards.lists();
