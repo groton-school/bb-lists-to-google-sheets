@@ -1,16 +1,18 @@
+/** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
+
 const SKY = {
-  RESOURCE_NAME: 'Blackbaud SKY API',
-  URL_AUTH: 'https://oauth2.sky.blackbaud.com/authorization',
-  URL_TOKEN: 'https://oauth2.sky.blackbaud.com/token',
-  HEADER_ACCESS_KEY: 'Bb-Api-Subscription-Key',
-  PROP_CLIENT: 'SKY_CLIENT_ID',
-  PROP_SECRET: 'SKY_CLIENT_SECRET',
-  PROP_ACCESS_KEY: 'SKY_ACCESS_KEY',
+  RESOURCE_NAME: "Blackbaud SKY API",
+  URL_AUTH: "https://oauth2.sky.blackbaud.com/authorization",
+  URL_TOKEN: "https://oauth2.sky.blackbaud.com/token",
+  HEADER_ACCESS_KEY: "Bb-Api-Subscription-Key",
+  PROP_CLIENT: "SKY_CLIENT_ID",
+  PROP_SECRET: "SKY_CLIENT_SECRET",
+  PROP_ACCESS_KEY: "SKY_ACCESS_KEY",
 
   Response: {
-    Raw: Symbol('raw'),
-    JSON: Symbol('json'),
-    Array: Symbol('array'),
+    Raw: Symbol("raw"),
+    JSON: Symbol("json"),
+    Array: Symbol("array"),
   },
 
   school: {
@@ -25,7 +27,7 @@ const SKY = {
               if (response.count == 0) {
                 return [];
               }
-              return response.results.rows.map(row => {
+              return response.results.rows.map((row) => {
                 const obj = {};
                 for ({ name, value } of row.columns) {
                   obj[name] = value;
@@ -36,7 +38,7 @@ const SKY = {
               if (response.count == 0) {
                 return [];
               }
-              const array = response.results.rows.map(row => {
+              const array = response.results.rows.map((row) => {
                 const arr = [];
                 for ({ name, value } of row.columns) {
                   arr.push(value);
@@ -44,9 +46,7 @@ const SKY = {
                 return arr;
               });
               array.unshift(
-                response.results.rows[0].columns.map(
-                  ({ name, value }) => name
-                )
+                response.results.rows[0].columns.map(({ name, value }) => name)
               );
               return array;
             case SKY.Response.Raw:
@@ -55,7 +55,7 @@ const SKY = {
           }
         } else {
           const response = SKY.call(
-            'https://api.sky.blackbaud.com/school/v1/lists'
+            "https://api.sky.blackbaud.com/school/v1/lists"
           );
           switch (format) {
             case SKY.Response.JSON:
@@ -79,7 +79,7 @@ const SKY = {
         .setTokenUrl(SKY.URL_TOKEN)
         .setClientId(scriptProperties.getProperty(SKY.PROP_CLIENT))
         .setClientSecret(scriptProperties.getProperty(SKY.PROP_SECRET))
-        .setCallbackFunction('__Sky_callbackAuthorization')
+        .setCallbackFunction("__Sky_callbackAuthorization")
         .setPropertyStore(PropertiesService.getUserProperties())
         .setCache(CacheService.getUserCache())
         .setLock(LockService.getUserLock());
@@ -87,7 +87,7 @@ const SKY = {
     return SKY._service_;
   },
 
-  call: (url, method = 'get', headers = {}) => {
+  call: (url, method = "get", headers = {}) => {
     const service = SKY.getService();
     const scriptProperties = PropertiesService.getScriptProperties();
     var maybeAuthorized = service.hasAccess();
@@ -96,8 +96,8 @@ const SKY = {
       headers[SKY.HEADER_ACCESS_KEY] = scriptProperties.getProperty(
         SKY.PROP_ACCESS_KEY
       );
-      headers['Authorization'] = Utilities.formatString(
-        'Bearer %s',
+      headers["Authorization"] = Utilities.formatString(
+        "Bearer %s",
         accessToken
       );
       const response = UrlFetchApp.fetch(url, {
@@ -107,22 +107,22 @@ const SKY = {
       });
       const code = response.getResponseCode();
       if (code >= 200 && code < 300) {
-        return JSON.parse(response.getContentText('utf-8'));
+        return JSON.parse(response.getContentText("utf-8"));
       } else if (code == 401 || code == 403) {
         maybeAuthorized = false;
       } else {
         console.error(
-          'Backend server error (%s): %s',
+          "Backend server error (%s): %s",
           code.toString(),
-          resp.getContentText('utf-8')
+          resp.getContentText("utf-8")
         );
-        throw 'Backend server error: ' + code;
+        throw "Backend server error: " + code;
       }
     }
 
     if (!maybeAuthorized) {
       CardService.newAuthorizationException()
-        .setCustomUiCallback('__Sky.cardAuthorization')
+        .setCustomUiCallback("__Sky.cardAuthorization")
         .throwException();
     }
   },
@@ -134,29 +134,25 @@ const SKY = {
   cardAuthorization: () => {
     return [
       CardService.newCardBuilder()
-        .setHeader(
-          TerseCardService.newCardHeader('Authorization Required')
-        )
+        .setHeader(TerseCardService.newCardHeader("Authorization Required"))
         .addSection(
           CardService.newCardSection()
             .addWidget(
               CardService.newGrid().addItem(
                 CardService.newGridItem().setImage(
-                  CardService.newImageComponent().setImageUrl(
-                    App.LOGO_URL
-                  )
+                  CardService.newImageComponent().setImageUrl(App.LOGO_URL)
                 )
               )
             )
             .addWidget(
               TerseCardService.newTextParagraph(
-                'This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.'
+                "This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf."
               )
             )
             .addWidget(
               CardService.newButtonSet().addButton(
                 CardService.newTextButton()
-                  .setText('Begin Authorization')
+                  .setText("Begin Authorization")
                   .setAuthorizationAction(
                     CardService.newAuthorizationAction().setAuthorizationUrl(
                       SKY.getService().getAuthorizationUrl()
@@ -169,12 +165,12 @@ const SKY = {
     ];
   },
 
-  callbackAuthorization: callbackRequest => {
+  callbackAuthorization: (callbackRequest) => {
     const authorized = SKY.getService().handleCallback(callbackRequest);
     if (authorized) {
-      return HtmlService.createHtmlOutput('<h1>Authorized</h1>');
+      return HtmlService.createHtmlOutput("<h1>Authorized</h1>");
     } else {
-      return HtmlService.createHtmlOutput('<h1>Denied</h1>');
+      return HtmlService.createHtmlOutput("<h1>Denied</h1>");
     }
   },
 };

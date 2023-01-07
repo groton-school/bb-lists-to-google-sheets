@@ -1,32 +1,34 @@
-const Intent = {
-  CreateSpreadsheet: Symbol('create'),
-  AppendSheet: Symbol('append'),
-  ReplaceSelection: Symbol('replace'),
-  UpdateExisting: Symbol('update'),
+/** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
 
-  serialize: sym => {
+const Intent = {
+  CreateSpreadsheet: Symbol("create"),
+  AppendSheet: Symbol("append"),
+  ReplaceSelection: Symbol("replace"),
+  UpdateExisting: Symbol("update"),
+
+  serialize: (sym) => {
     switch (sym) {
       case Intent.CreateSpreadsheet:
-        return 'create';
+        return "create";
       case Intent.AppendSheet:
-        return 'append';
+        return "append";
       case Intent.ReplaceSelection:
-        return 'replace';
+        return "replace";
       case Intent.UpdateExisting:
-        return 'update';
+        return "update";
       default:
         return null;
     }
   },
-  deserialize: str => {
+  deserialize: (str) => {
     switch (str) {
-      case 'create':
+      case "create":
         return Intent.CreateSpreadsheet;
-      case 'append':
+      case "append":
         return Intent.AppendSheet;
-      case 'replace':
+      case "replace":
         return Intent.ReplaceSelection;
-      case 'update':
+      case "update":
         return Intent.UpdateExisting;
       default:
         return null;

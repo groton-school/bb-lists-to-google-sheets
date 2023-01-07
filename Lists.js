@@ -1,11 +1,12 @@
+/** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
+
 const Lists = {
   UNCATEGORIZED: `${App.PREFIX}.Lists.uncategorized`,
   BLACKBAUD_PAGE_SIZE: 1000,
 
   setSheetName(sheet, timestamp = null) {
     sheet.setName(
-      `${State.getList().name} (${timestamp || new Date().toLocaleString()
-      })`
+      `${State.getList().name} (${timestamp || new Date().toLocaleString()})`
     );
     Sheets.metadata.set(Sheets.metadata.NAME, sheet.getName(), sheet);
   },
@@ -31,9 +32,7 @@ const Lists = {
         Lists.BLACKBAUD_PAGE_SIZE + 1 /* column labels */
       ) {
         State.setPage(1);
-        return TerseCardService.replaceStack(
-          Lists.cards.loadNextPage()
-        );
+        return TerseCardService.replaceStack(Lists.cards.loadNextPage());
       } else {
         return Lists.actions.insertData({
           parameters: { state: State.toJSON() },
@@ -49,9 +48,7 @@ const Lists = {
         .slice(1); // trim off unneeded column labels
       State.appendData(data);
       if (data.length == Lists.BLACKBAUD_PAGE_SIZE) {
-        return TerseCardService.replaceStack(
-          Lists.cards.loadNextPage()
-        );
+        return TerseCardService.replaceStack(Lists.cards.loadNextPage());
       } else {
         return Lists.actions.insertData({
           parameters: { state: State.toJSON() },
@@ -97,9 +94,7 @@ const Lists = {
           );
           break;
         case Intent.UpdateExisting:
-          const metaRange = Sheets.metadata.get(
-            Sheets.metadata.RANGE
-          );
+          const metaRange = Sheets.metadata.get(Sheets.metadata.RANGE);
           range = Sheets.adjustRange(
             {
               ...metaRange,
@@ -120,21 +115,16 @@ const Lists = {
           );
           // FIXME ...and we're back to not moving the spreadsheet to the current folder, again
           if (State.getFolder()) {
-            DriveApp.getFileById(
-              State.getSpreadsheet().getId()
-            ).moveTo(State.getFolder());
+            DriveApp.getFileById(State.getSpreadsheet().getId()).moveTo(
+              State.getFolder()
+            );
           }
           State.setSheet(State.getSpreadsheet().getSheets()[0]);
-          range = State.getSheet().getRange(
-            1,
-            1,
-            data.length,
-            data[0].length
-          );
+          range = State.getSheet().getRange(1, 1, data.length, data[0].length);
       }
 
       range.setValues(data);
-      range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
+      range.offset(0, 0, 1, range.getNumColumns()).setFontWeight("bold");
       const timestamp = new Date().toLocaleString();
 
       Sheets.metadata.set(
@@ -154,9 +144,7 @@ const Lists = {
       );
       range
         .offset(0, 0, 1, 1)
-        .setNote(
-          `Last updated from "${State.getList().name}" ${timestamp}`
-        );
+        .setNote(`Last updated from "${State.getList().name}" ${timestamp}`);
 
       switch (State.getIntent()) {
         case Intent.ReplaceSelection:
@@ -165,9 +153,7 @@ const Lists = {
             `${range.getSheet().getName()}-existing`,
             range.getSheet()
           );
-          return TerseCardService.replaceStack(
-            Sheets.cards.updated()
-          );
+          return TerseCardService.replaceStack(Sheets.cards.updated());
         case Intent.UpdateExisting:
           if (
             range.getSheet().getName() ==
@@ -175,17 +161,13 @@ const Lists = {
           ) {
             Lists.setSheetName(range.getSheet());
           }
-          return TerseCardService.replaceStack(
-            Sheets.cards.updated()
-          );
+          return TerseCardService.replaceStack(Sheets.cards.updated());
         case Intent.AppendSheet:
           range.getSheet().setFrozenRows(1);
           Lists.setSheetName(range.getSheet(), timestamp);
           // TODO why isn't the appended sheet made active?
           State.getSpreadsheet().setActiveSheet(range.getSheet());
-          return TerseCardService.replaceStack(
-            Sheets.cards.sheetAppended()
-          );
+          return TerseCardService.replaceStack(Sheets.cards.sheetAppended());
         case Intent.CreateSpreadsheet:
         default:
           range.getSheet().setFrozenRows(1);
@@ -229,7 +211,7 @@ const Lists = {
           break;
         case Intent.CreateSpreadsheet:
         default:
-          intentBasedActionDescription = 'a new spreadsheet';
+          intentBasedActionDescription = "a new spreadsheet";
       }
 
       const card = CardService.newCardBuilder().addSection(
@@ -254,18 +236,12 @@ const Lists = {
         sortCategoriesWithUncategorizedLast
       )) {
         const section = CardService.newCardSection().setHeader(
-          category == Lists.UNCATEGORIZED ? 'Uncategorized' : category
+          category == Lists.UNCATEGORIZED ? "Uncategorized" : category
         );
         for (const list of lists[category]) {
           section.addWidget(
-            TerseCardService.newDecoratedText(
-              null,
-              list.name
-            ).setOnClickAction(
-              TerseCardService.newAction(
-                '__Lists_actions_listDetail',
-                { list }
-              )
+            TerseCardService.newDecoratedText(null, list.name).setOnClickAction(
+              TerseCardService.newAction("__Lists_actions_listDetail", { list })
             )
           );
         }
@@ -275,13 +251,13 @@ const Lists = {
     },
 
     listDetail() {
-      var buttonNameBasedOnIntent = 'Create Spreadsheet';
+      var buttonNameBasedOnIntent = "Create Spreadsheet";
       switch (State.getIntent()) {
         case Intent.AppendSheet:
-          buttonNameBasedOnIntent = 'Append Sheet';
+          buttonNameBasedOnIntent = "Append Sheet";
           break;
         case Intent.ReplaceSelection:
-          buttonNameBasedOnIntent = 'Replace Selection';
+          buttonNameBasedOnIntent = "Replace Selection";
           break;
       }
 
@@ -297,8 +273,7 @@ const Lists = {
             )
             .addWidget(
               TerseCardService.newDecoratedText(
-                `Created by ${State.getList().created_by
-                } ${new Date(
+                `Created by ${State.getList().created_by} ${new Date(
                   State.getList().created
                 ).toLocaleString()}`,
                 null,
@@ -310,7 +285,7 @@ const Lists = {
             .addWidget(
               TerseCardService.newTextButton(
                 buttonNameBasedOnIntent,
-                '__Lists_actions_importData'
+                "__Lists_actions_importData"
               )
             )
         )
@@ -324,20 +299,20 @@ const Lists = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts'
+                "Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts"
               )
             )
             .addWidget(
               TerseCardService.newTextParagraph(
-                `${State.getData().length - 1
-                } records have been loaded from "${State.getList().name
+                `${State.getData().length - 1} records have been loaded from "${
+                  State.getList().name
                 }" so far.`
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
                 `Load Page ${State.getPage() + 1}`,
-                '__Lists_actions_loadNextPage'
+                "__Lists_actions_loadNextPage"
               )
             )
         )
@@ -355,20 +330,19 @@ const Lists = {
               )
             )
             .addWidget(
-              TerseCardService.newTextParagraph(
-                JSON.stringify(data, null, 2)
-              )
+              TerseCardService.newTextParagraph(JSON.stringify(data, null, 2))
             )
             .addWidget(
               TerseCardService.newTextParagraph(
-                `No data was returned in the list "${State.getList().name
+                `No data was returned in the list "${
+                  State.getList().name
                 }" so no sheet was created.`
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                'Try Another List',
-                '__App_actions_home'
+                "Try Another List",
+                "__App_actions_home"
               )
             )
         )

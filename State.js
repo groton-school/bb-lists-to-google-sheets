@@ -1,3 +1,5 @@
+/** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
+
 const State = {
   folder: null,
   spreadsheet: null,
@@ -46,9 +48,7 @@ const State = {
   getSheet() {
     if (State.sheet && State.spreadsheet) {
       if (!State._sheet) {
-        State._sheet = State.getSpreadsheet().getSheetByName(
-          State.sheet
-        );
+        State._sheet = State.getSpreadsheet().getSheetByName(State.sheet);
       }
       return State._sheet;
     }
@@ -154,28 +154,28 @@ const State = {
     return State.reset(serializedState);
   },
 
-  restore: serializedState => {
+  restore: (serializedState) => {
     return State.reset(serializedState);
   },
 
-  toJSON: stateChanges => {
+  toJSON: (stateChanges) => {
     if (stateChanges) {
       for (const key of Object.keys(stateChanges)) {
         const value = stateChanges[key];
         switch (key) {
-          case 'folder':
+          case "folder":
             State.setFolder(value);
             break;
-          case 'spreadsheet':
+          case "spreadsheet":
             State.setSpreadsheet(value);
             break;
-          case 'sheet':
+          case "sheet":
             State.setSheet(value);
             break;
-          case 'selection':
+          case "selection":
             State.setSelection(value);
             break;
-          case 'intent':
+          case "intent":
             State.setIntent(value);
             break;
           default:

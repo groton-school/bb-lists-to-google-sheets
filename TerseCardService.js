@@ -1,3 +1,5 @@
+/** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
+
 const TerseCardService = {
   replaceStack(card, url = null) {
     var action = CardService.newActionResponseBuilder().setNavigation(
@@ -26,7 +28,7 @@ const TerseCardService = {
   },
 
   newDecoratedText(topLabel = null, text, bottomLabel = null, wrap = true) {
-    var decoratedText = CardService.newDecoratedText().setText(text || ' ');
+    var decoratedText = CardService.newDecoratedText().setText(text || " ");
     if (topLabel) {
       decoratedText = decoratedText.setTopLabel(topLabel);
     }
@@ -42,9 +44,7 @@ const TerseCardService = {
   newTextButton(text, functionName, stateChamge = null) {
     return CardService.newTextButton()
       .setText(text)
-      .setOnClickAction(
-        TerseCardService.newAction(functionName, stateChamge)
-      );
+      .setOnClickAction(TerseCardService.newAction(functionName, stateChamge));
   },
 
   newAction(functionName, stateChange = null) {
