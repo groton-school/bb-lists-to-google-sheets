@@ -24,6 +24,7 @@ const State = {
       }
       return State._folder;
     }
+    return null;
   },
 
   setFolder(folder) {
@@ -38,6 +39,7 @@ const State = {
       }
       return State._spreadsheet;
     }
+    return null;
   },
 
   setSpreadsheet(spreadsheet) {
@@ -52,6 +54,7 @@ const State = {
       }
       return State._sheet;
     }
+    return null;
   },
 
   setSheet(sheet) {
@@ -67,6 +70,7 @@ const State = {
       }
       return State._selection;
     }
+    return null;
   },
 
   setSelection(range) {
@@ -87,6 +91,7 @@ const State = {
     if (State.data) {
       return State._data;
     }
+    return null;
   },
 
   _parseData() {
@@ -125,6 +130,7 @@ const State = {
       }
       return State._intent;
     }
+    return null;
   },
 
   setIntent(intent) {

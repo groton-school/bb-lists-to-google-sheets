@@ -26,9 +26,8 @@ const App = {
     home() {
       if (State.getSpreadsheet()) {
         return Sheets.cards.options();
-      } else {
-        return Lists.cards.lists();
       }
+      return Lists.cards.lists();
     },
 
     error(message = "An error occurred") {
