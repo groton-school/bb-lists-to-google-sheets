@@ -156,10 +156,6 @@ const State = {
     }
   },
 
-  restore(serializedState) {
-    return State.reset(serializedState);
-  },
-
   restore: (serializedState) => {
     return State.reset(serializedState);
   },
