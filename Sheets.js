@@ -10,13 +10,18 @@ const Sheets = {
 
     get(key, sheet = null) {
       sheet = sheet || State.getSheet();
-      const meta = sheet.createDeveloperMetadataFinder().withKey(key).find();
-      if (meta && meta.length) {
-        const value = meta.shift().getValue();
-        try {
-          return JSON.parse(value);
-        } catch (e) {
-          return value;
+      if (sheet) {
+        const meta = sheet
+          .createDeveloperMetadataFinder()
+          .withKey(key)
+          .find();
+        if (meta && meta.length) {
+          const value = meta.shift().getValue();
+          try {
+            return JSON.parse(value);
+          } catch (e) {
+            return value;
+          }
         }
       }
       return null;
@@ -24,20 +29,31 @@ const Sheets = {
 
     set(key, value, sheet = null) {
       sheet = sheet || State.getSheet();
-      str = JSON.stringify(value);
-      const meta = sheet.createDeveloperMetadataFinder().withKey(key).find();
-      if (meta && meta.length) {
-        return meta.shift().setValue(str);
-      } else {
-        return sheet.addDeveloperMetadata(key, str);
+      if (sheet) {
+        str = JSON.stringify(value);
+        const meta = sheet
+          .createDeveloperMetadataFinder()
+          .withKey(key)
+          .find();
+        if (meta && meta.length) {
+          return meta.shift().setValue(str);
+        } else {
+          return sheet.addDeveloperMetadata(key, str);
+        }
       }
+      return false;
     },
 
     delete(key, sheet = null) {
       sheet = sheet || State.getSheet();
-      const meta = sheet.createDeveloperMetadataFinder().withKey(key).find();
-      if (meta && meta.length) {
-        return meta.shift().remove();
+      if (sheet) {
+        const meta = sheet
+          .createDeveloperMetadataFinder()
+          .withKey(key)
+          .find();
+        if (meta && meta.length) {
+          return meta.shift().remove();
+        }
       }
       return null;
     },
@@ -56,8 +72,14 @@ const Sheets = {
   rangeFromJSON(json) {
     // FIXME this fallback is unsafe without tracking tab changes!
     const sheet =
-      State.getSpreadsheet().getSheetByName(json.sheet) || State.getSheet();
-    return sheet.getRange(json.row, json.column, json.numRows, json.numColumns);
+      State.getSpreadsheet().getSheetByName(json.sheet) ||
+      State.getSheet();
+    return sheet.getRange(
+      json.row,
+      json.column,
+      json.numRows,
+      json.numColumns
+    );
   },
 
   adjustRange(
@@ -68,7 +90,10 @@ const Sheets = {
     if (range) {
       sheet = range.getSheet();
       if (numRows > range.getNumRows()) {
-        sheet.insertRows(range.getLastRow() + 1, numRows - range.getNumRows());
+        sheet.insertRows(
+          range.getLastRow() + 1,
+          numRows - range.getNumRows()
+        );
       }
       if (numColumns > range.getNumColumns()) {
         sheet.insertColumns(
@@ -81,16 +106,19 @@ const Sheets = {
         sheet.deleteRows(numRows + 1, sheet.getMaxRows() - numRows);
       }
       if (numColumns < sheet.getMaxColumns()) {
-        sheet.deleteColumns(numColumns + 1, sheet.getMaxColumns() - numColumns);
+        sheet.deleteColumns(
+          numColumns + 1,
+          sheet.getMaxColumns() - numColumns
+        );
       }
     }
     return sheet.getRange(row, column, numRows, numColumns);
   },
 
   actions: {
-    spreadsheetCreated({ parameters: { state } }) {
+    openSpreadsheet({ parameters: { state } }) {
       State.restore(state);
-      const url = State.getSpreadsheet().getUrl(); // App launch will reset the State
+      const url = State.getSpreadsheet().getUrl();
       return TerseCardService.replaceStack(App.launch(), url);
     },
 
@@ -101,7 +129,9 @@ const Sheets = {
 
     breakConnection({ parameters: { state } }) {
       State.restore(state);
-      return TerseCardService.pushCard(Sheets.cards.confirmBreakConnection());
+      return TerseCardService.pushCard(
+        Sheets.cards.confirmBreakConnection()
+      );
     },
 
     deleteMetadata({ parameters: { state } }) {
@@ -130,37 +160,39 @@ const Sheets = {
               TerseCardService.newDecoratedText(
                 State.getSheet().getName(),
                 `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
-                `Last updated ${
-                  Sheets.metadata.get(Sheets.metadata.LAST_UPDATED) ||
-                  "at an unknown time"
+                `Last updated ${Sheets.metadata.get(
+                  Sheets.metadata.LAST_UPDATED
+                ) || 'at an unknown time'
                 }`
               )
             )
             .addWidget(
               TerseCardService.newTextParagraph(
-                "If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data."
+                'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.'
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Update",
-                "__Lists_actions_importData",
+                'Update',
+                '__Lists_actions_importData',
                 {
                   intent: Intent.UpdateExisting,
-                  list: Sheets.metadata.get(Sheets.metadata.LIST),
+                  list: Sheets.metadata.get(
+                    Sheets.metadata.LIST
+                  ),
                 }
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Show Metadata",
-                "__Sheets_actions_showMetadata"
+                'Show Metadata',
+                '__Sheets_actions_showMetadata'
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Break Connection",
-                "__Sheets_actions_breakConnection"
+                'Break Connection',
+                '__Sheets_actions_breakConnection'
               )
             )
         );
@@ -178,11 +210,13 @@ const Sheets = {
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Replace Selection",
-                "__Lists_actions_lists",
+                'Replace Selection',
+                '__Lists_actions_lists',
                 {
                   intent: Intent.ReplaceSelection,
-                  selection: State.getSheet().getSelection().getActiveRange(),
+                  selection: State.getSheet()
+                    .getSelection()
+                    .getActiveRange(),
                 }
               )
             )
@@ -193,15 +227,15 @@ const Sheets = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextButton(
-                "Append New Sheet",
-                "__Lists_actions_lists",
+                'Append New Sheet',
+                '__Lists_actions_lists',
                 { intent: Intent.AppendSheet }
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "New Spreadsheet",
-                "__Lists_actions_lists",
+                'New Spreadsheet',
+                '__Lists_actions_lists',
                 { intent: Intent.CreateSpreadsheet }
               )
             )
@@ -210,18 +244,22 @@ const Sheets = {
     },
     sheetAppended() {
       return CardService.newCardBuilder()
-        .setHeader(TerseCardService.newCardHeader(State.getSheet().getName()))
+        .setHeader(
+          TerseCardService.newCardHeader(State.getSheet().getName())
+        )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The sheet "${State.getSheet().getName()}" has been appended to "${State.getSpreadsheet().getName()}" and populated with the data in "${
-                  State.getList().name
+                `The sheet "${State.getSheet().getName()}" has been appended to "${State.getSpreadsheet().getName()}" and populated with the data in "${State.getList().name
                 }" from Blackbaud.`
               )
             )
             .addWidget(
-              TerseCardService.newTextButton("Done", "__App_actions_home")
+              TerseCardService.newTextButton(
+                'Done',
+                '__App_actions_home'
+              )
             )
         )
         .build();
@@ -229,25 +267,25 @@ const Sheets = {
     spreadsheetCreated() {
       return CardService.newCardBuilder()
         .setHeader(
-          TerseCardService.newCardHeader(State.getSpreadsheet().getName())
+          TerseCardService.newCardHeader(
+            State.getSpreadsheet().getName()
+          )
         )
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The spreadsheet "${State.getSpreadsheet().getName()}" has been created in ${
-                  State.getFolder()
-                    ? `the folder "${State.getFolder().folder.getName()}"`
-                    : "your My Drive"
-                } and populated with the data in "${
-                  State.getList().name
+                `The spreadsheet "${State.getSpreadsheet().getName()}" has been created in ${State.getFolder()
+                  ? `the folder "${State.getFolder().getName()}"`
+                  : 'your My Drive'
+                } and populated with the data in "${State.getList().name
                 }" from Blackbaud.`
               )
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Open Spreadsheet",
-                "__Sheets_actions_spreadsheetCreated"
+                'Open Spreadsheet',
+                '__Sheets_actions_openSpreadsheet'
               )
             )
         )
@@ -268,13 +306,16 @@ const Sheets = {
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newTextParagraph(
-                `The sheet "${State.getSheet().getName()}" of "${State.getSpreadsheet().getName()}" has been updated with the current data from "${
-                  Sheets.metadata.get(Sheets.metadata.LIST).name
+                `The sheet "${State.getSheet().getName()}" of "${State.getSpreadsheet().getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST)
+                  .name
                 }" in Blackbaud.`
               )
             )
             .addWidget(
-              TerseCardService.newTextButton("Done", "__App_actions_home")
+              TerseCardService.newTextButton(
+                'Done',
+                '__App_actions_home'
+              )
             )
         )
         .build();
@@ -282,7 +323,9 @@ const Sheets = {
 
     showMetadata() {
       return CardService.newCardBuilder()
-        .setHeader(TerseCardService.newCardHeader(State.getSheet().getName()))
+        .setHeader(
+          TerseCardService.newCardHeader(State.getSheet().getName())
+        )
         .addSection(
           CardService.newCardSection()
             .addWidget(
@@ -290,18 +333,22 @@ const Sheets = {
                 `${State.getSheet().getName()} Deeloper Metadata`,
                 JSON.stringify(
                   {
-                    [Sheets.metadata.LIST]: Sheets.metadata.get(
-                      Sheets.metadata.LIST
-                    ),
-                    [Sheets.metadata.RANGE]: Sheets.metadata.get(
-                      Sheets.metadata.RANGE
-                    ),
-                    [Sheets.metadata.NAME]: Sheets.metadata.get(
-                      Sheets.metadata.NAME
-                    ),
-                    [Sheets.metadata.LAST_UPDATED]: Sheets.metadata.get(
-                      Sheets.metadata.LAST_UPDATED
-                    ),
+                    [Sheets.metadata.LIST]:
+                      Sheets.metadata.get(
+                        Sheets.metadata.LIST
+                      ),
+                    [Sheets.metadata.RANGE]:
+                      Sheets.metadata.get(
+                        Sheets.metadata.RANGE
+                      ),
+                    [Sheets.metadata.NAME]:
+                      Sheets.metadata.get(
+                        Sheets.metadata.NAME
+                      ),
+                    [Sheets.metadata.LAST_UPDATED]:
+                      Sheets.metadata.get(
+                        Sheets.metadata.LAST_UPDATED
+                      ),
                   },
                   null,
                   2
@@ -309,7 +356,10 @@ const Sheets = {
               )
             )
             .addWidget(
-              TerseCardService.newTextButton("Done", "__App_actions_home")
+              TerseCardService.newTextButton(
+                'Done',
+                '__App_actions_home'
+              )
             )
         )
         .build();
@@ -327,12 +377,15 @@ const Sheets = {
             )
             .addWidget(
               TerseCardService.newTextButton(
-                "Delete Metadata",
-                "__Sheets_actions_deleteMetadata"
+                'Delete Metadata',
+                '__Sheets_actions_deleteMetadata'
               )
             )
             .addWidget(
-              TerseCardService.newTextButton("Cancel", "__App_actions_home")
+              TerseCardService.newTextButton(
+                'Cancel',
+                '__App_actions_home'
+              )
             )
         )
         .build();
@@ -344,8 +397,8 @@ function __Sheets_actions_update(...args) {
   return Sheets.actions.update(...args);
 }
 
-function __Sheets_actions_spreadsheetCreated(...args) {
-  return Sheets.actions.spreadsheetCreated(...args);
+function __Sheets_actions_openSpreadsheet(...args) {
+  return Sheets.actions.openSpreadsheet(...args);
 }
 
 function __Sheets_actions_showMetadata(...args) {

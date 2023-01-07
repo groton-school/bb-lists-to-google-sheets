@@ -1,16 +1,17 @@
 /** global: App, Drive, Intent, Lists, Sheets, SKY, State, TerseCardService, DriveApp, SpreadsheetApp, CardService, HtmlService, PropertiesService, CacheService, LockService, OAuth2, UrlFetchApp */
 
 const App = {
-  PREFIX: "org.groton.BbListsToGoogleSheets",
+  PREFIX: 'org.groton.BbListsToGoogleSheets',
   LOGO_URL:
-    "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+    'https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0',
 
   launch(event) {
     if (event) {
       App.launchEvent = event;
     }
+    const folder = State.getFolder();
     State.reset();
-    State.setFolder(Drive.inferFolder(App.launchEvent));
+    State.setFolder(folder || Drive.inferFolder(App.launchEvent));
     // TODO can also infer folder from parent of current spreadsheet
     return App.cards.home();
   },
@@ -24,25 +25,32 @@ const App = {
 
   cards: {
     home() {
-      if (State.getSpreadsheet()) {
+      if (State.getSelection()) {
         return Sheets.cards.options();
       }
       return Lists.cards.lists();
     },
 
-    error(message = "An error occurred") {
+    error(message = 'An error occurred') {
       return CardService.newCardBuilder()
         .setHeader(TerseCardService.newCardHeader(message))
         .addSection(
           CardService.newCardSection()
             .addWidget(
               TerseCardService.newDecoratedText(
-                "State",
-                JSON.stringify(JSON.parse(State.toJSON()), null, 2)
+                'State',
+                JSON.stringify(
+                  JSON.parse(State.toJSON()),
+                  null,
+                  2
+                )
               )
             )
             .addWidget(
-              TerseCardService.newTextButton("Start Over", "__App_actions_home")
+              TerseCardService.newTextButton(
+                'Start Over',
+                '__App_actions_home'
+              )
             )
         )
         .build();
