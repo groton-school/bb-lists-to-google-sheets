@@ -1,3 +1,5 @@
 .clasp.json
-.nova
+/.nova/*
+!/.nova/Artwork
+!/.nova/Configuration.json
 /node_modules
