@@ -146,12 +146,10 @@ const State = {
       }
     }
 
-    if (!State.spreadsheet) {
+    const spreadsheet = SpreadsheetApp.getActive();
+    if (!State.spreadsheet && spreadsheet) {
       State.setSelection(
-        SpreadsheetApp.getActive()
-          .getActiveSheet()
-          .getSelection()
-          .getActiveRange()
+        spreadsheet.getActiveSheet().getSelection().getActiveRange()
       );
     }
   },
