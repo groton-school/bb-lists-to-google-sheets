@@ -20,6 +20,10 @@ export default class App {
             State.reset();
             return Terse.CardService.replaceStack(App.cards.home());
         }
+
+        public static error() {
+            return Terse.CardService.replaceStack(App.cards.error());
+        }
     };
 
     public static cards = class {

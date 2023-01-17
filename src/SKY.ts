@@ -184,6 +184,7 @@ export default class SKY {
                         .addWidget(
                             CardService.newGrid().addItem(
                                 CardService.newGridItem().setImage(
+                                    // FIXME logo is not loading
                                     CardService.newImageComponent().setImageUrl(LOGO_URL)
                                 )
                             )

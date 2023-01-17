@@ -4,7 +4,7 @@ import Sheets from './Sheets';
 import SKY from './SKY';
 import State from './State';
 
-const updateState = ({ parameters: { state } }) => {
+const updateState = ({ parameters: { state = null } }) => {
     if (state) {
         state = JSON.parse(state);
         if (state.folder) {
@@ -43,48 +43,58 @@ const updateState = ({ parameters: { state } }) => {
     }
 };
 
-global.__App_launch = (e) => {
-    return App.launch(e);
+global.__App_launch = (event) => {
+    return App.launch(event);
+};
+
+global.__App_actions_error = (arg) => {
+    updateState(arg);
+    return App.actions.error();
 };
 
 global.__App_actions_home = (arg) => {
     updateState(arg);
-    App.actions.home();
+    return App.actions.home();
 };
 
 global.__Lists_actions_importData = (arg) => {
     updateState(arg);
-    Lists.actions.importData();
+    return Lists.actions.importData();
 };
 
 global.__Lists_actions_lists = (arg) => {
     updateState(arg);
-    Lists.actions.lists();
+    return Lists.actions.lists();
 };
 
 global.__Lists_actions_listDetail = (arg) => {
     updateState(arg);
-    Lists.actions.listDetail();
+    return Lists.actions.listDetail();
 };
 
 global.__Lists_actions_loadNextPage = (arg) => {
     updateState(arg);
-    Lists.actions.loadNextPage();
+    return Lists.actions.loadNextPage();
+};
+
+global.__Sheets_actions_breakConnection = (arg) => {
+    updateState(arg);
+    return Sheets.actions.breakConnection();
 };
 
 global.__Sheets_actions_deleteMetadata = (arg) => {
     updateState(arg);
-    Sheets.actions.deleteMetadata();
+    return Sheets.actions.deleteMetadata();
 };
 
 global.__Sheets_actions_openSpreadsheet = (arg) => {
     updateState(arg);
-    Sheets.actions.openSpreadsheet();
+    return Sheets.actions.openSpreadsheet();
 };
 
 global.__Sheets_actions_showMetadata = (arg) => {
     updateState(arg);
-    Sheets.actions.showMetadata();
+    return Sheets.actions.showMetadata();
 };
 
 global.__Sky_cardAuthorization = () => {

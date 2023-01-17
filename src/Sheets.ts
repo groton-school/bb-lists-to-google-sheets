@@ -166,7 +166,7 @@ export default class Sheets {
                         .addWidget(
                             Terse.CardService.newTextButton(
                                 'Break Connection',
-                                '__Sheets_actions_showMetadata'
+                                '__Sheets_actions_breakConnection'
                             )
                         )
                 );

@@ -530,7 +530,7 @@ packages:
     resolution: {integrity: sha512-TPJ2Xfaewetvg3lVGiE9Pk62/ZNF3WIxloasOsEnJSs1A++K5hBKNBvvhpX+221XP8/NvPsz+0K2CGDEeJvebQ==}
     dependencies:
       gas-entry-generator: 2.2.0
-      minimatch: 5.1.4
+      minimatch: 5.1.6
       slash: 3.0.0
       webpack-sources: 3.2.3
     dev: true
@@ -669,8 +669,8 @@ packages:
       mime-db: 1.52.0
     dev: true
 
-  /minimatch/5.1.4:
-    resolution: {integrity: sha512-U0iNYXt9wALljzfnGkhFSy5sAC6/SCR3JrHrlsdJz4kF8MvhTRQNiC59iUi1iqsitV7abrNAJWElVL9pdnoUgw==}
+  /minimatch/5.1.6:
+    resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1

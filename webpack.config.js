@@ -2,8 +2,7 @@ const path = require('path');
 const GasPlugin = require('gas-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
-  devtool: 'inline-source-map',
+  mode: 'production',
   entry: {
     main: './src/index.ts',
   },
