@@ -1,5 +1,23 @@
 {
   "dependencies": {
-    "@types/google-apps-script": "^1.0.56"
-  }
+    "@battis/google-apps-script-helpers": "github:battis/google-apps-script-helpers",
+    "@types/google-apps-script": "^1.0.57"
+  },
+  "scripts": {
+    "build": "npx webpack",
+    "clean": "rm -rf ./build/*",
+    "deploy": "npm run build; clasp push"
+  },
+  "devDependencies": {
+    "@battis/prettier-config": "github:battis/prettier-config",
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/google-apps-script-oauth2": "^38.0.0",
+    "@types/node": "^18.11.18",
+    "gas-webpack-plugin": "^2.3.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "prettier": "@battis/prettier-config"
 }
