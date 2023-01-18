@@ -4,6 +4,7 @@
     "@types/google-apps-script": "^1.0.57"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "npx webpack",
     "clean": "rm -rf ./build/*",
     "deploy": "npm run build; clasp push"

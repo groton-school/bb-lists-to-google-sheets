@@ -1,7 +1,7 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import { LOGO_URL } from './Constants';
 
-export type ResponseData<T> = {
+type SkyResponseData<T> = {
     count: number;
     value: T[];
 };
@@ -17,24 +17,22 @@ export type List = {
     last_modified: string;
 };
 
-export type ListData = {
+type ColumnData = {
+    name: string;
+    value: string;
+};
+type RowData = {
+    columns: ColumnData[];
+};
+type ListData = {
     count: number;
     page: number;
     results: {
-        rows: [
-            {
-                columns: [
-                    {
-                        name: string;
-                        value: string;
-                    }
-                ];
-            }
-        ];
+        rows: RowData[];
     };
 };
 
-export enum Response {
+export enum SkyResponse {
     Raw = 'raw',
     JSON = 'json',
     Array = 'array',
@@ -45,7 +43,6 @@ export default class SKY {
     public static readonly URL_AUTH =
         'https://oauth2.sky.blackbaud.com/authorization';
     public static readonly URL_TOKEN = 'https://oauth2.sky.blackbaud.com/token';
-    public static readonly URL_API = 'https://api.sky.blackbaud.com';
     public static readonly HEADER_ACCESS_KEY: 'Bb-Api-Subscription-Key';
     public static readonly PROP_CLIENT = 'SKY_CLIENT_ID';
     public static readonly PROP_SECRET = 'SKY_CLIENT_SECRET';
@@ -55,33 +52,33 @@ export default class SKY {
         public static v1 = class {
             public static lists(
                 list_id = null,
-                format = Response.JSON,
+                format = SkyResponse.JSON,
                 page = 1
             ): any {
                 if (list_id) {
                     const response = SKY.call(
-                        `${SKY.URL_API}/school/v1/lists/advanced/${list_id}?page=${page}`
+                        `https://api.sky.blackbaud.com/school/v1/lists/advanced/${list_id}?page=${page}`
                     ) as ListData;
                     switch (format) {
-                        case Response.JSON:
+                        case SkyResponse.JSON:
                             if (response.count == 0) {
                                 return [];
                             }
                             return response.results.rows.map((row) => {
                                 const obj = {};
-                                for (const col of row.columns) {
-                                    obj[col.name] = col.value;
+                                for (const column of row.columns) {
+                                    obj[column.name] = column.value;
                                 }
                                 return obj;
                             });
-                        case Response.Array:
+                        case SkyResponse.Array:
                             if (response.count == 0) {
                                 return [];
                             }
                             const array = response.results.rows.map((row) => {
                                 const arr = [];
-                                for (const col of row.columns) {
-                                    arr.push(col.value);
+                                for (const column of row.columns) {
+                                    arr.push(column.value);
                                 }
                                 return arr;
                             });
@@ -89,18 +86,18 @@ export default class SKY {
                                 response.results.rows[0].columns.map(({ name, value }) => name)
                             );
                             return array;
-                        case Response.Raw:
+                        case SkyResponse.Raw:
                         default:
                             return response;
                     }
                 } else {
                     const response = SKY.call(
-                        `${SKY.URL_API}/school/v1/lists`
-                    ) as ResponseData<List>;
+                        `https://api.sky.blackbaud.com/school/v1/lists`
+                    ) as SkyResponseData<List>;
                     switch (format) {
-                        case Response.JSON:
+                        case SkyResponse.JSON:
                             return response.value;
-                        case Response.Raw:
+                        case SkyResponse.Raw:
                         default:
                             return response;
                     }
@@ -119,7 +116,7 @@ export default class SKY {
                 .setTokenUrl(SKY.URL_TOKEN)
                 .setClientId(scriptProperties.getProperty(SKY.PROP_CLIENT))
                 .setClientSecret(scriptProperties.getProperty(SKY.PROP_SECRET))
-                .setCallbackFunction('__Sky_callbackAuthorization')
+                .setCallbackFunction('action_SKY_callbackAuthorization')
                 .setPropertyStore(PropertiesService.getUserProperties())
                 .setCache(CacheService.getUserCache())
                 .setLock(LockService.getUserLock());
@@ -166,7 +163,7 @@ export default class SKY {
 
         if (!maybeAuthorized) {
             CardService.newAuthorizationException()
-                .setCustomUiCallback('__Sky_cardAuthorization')
+                .setCustomUiCallback('action_SKY_cardAuthorization')
                 .throwException();
         }
     }
@@ -212,6 +209,7 @@ export default class SKY {
 
     public static callbackAuthorization(callbackRequest) {
         const authorized = SKY.getService().handleCallback(callbackRequest);
+        // TODO better UI on API authorization
         if (authorized) {
             return HtmlService.createHtmlOutput('<h1>Authorized</h1>');
         } else {
@@ -219,3 +217,6 @@ export default class SKY {
         }
     }
 }
+
+global.action_SKY_callbackAuthorization = SKY.callbackAuthorization;
+global.action_SKY_cardAuthorization = SKY.cardAuthorization;

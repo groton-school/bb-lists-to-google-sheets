@@ -170,4 +170,43 @@ export default class State {
             );
         }
     }
+
+    public static update({ parameters: { state = null } }) {
+        if (state) {
+            state = JSON.parse(state);
+            if (state.folder) {
+                State.setFolder(DriveApp.getFolderById(state.folder));
+            }
+
+            var spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
+            if (state.spreadsheet) {
+                spreadsheet = SpreadsheetApp.openById(state.spreadsheet);
+            }
+            var sheet: GoogleAppsScript.Spreadsheet.Sheet;
+            if (state.sheet) {
+                spreadsheet = spreadsheet || State.getSpreadsheet();
+                sheet = spreadsheet.getSheetByName(state.sheet);
+            }
+            if (state.selection) {
+                sheet = sheet || State.getSheet();
+                State.setSelection(sheet.getRange(state.selection));
+            } else if (sheet) {
+                State.setSheet(sheet);
+            } else if (spreadsheet) {
+                State.setSpreadsheet(spreadsheet);
+            }
+            if (state.list) {
+                State.setList(state.list);
+            }
+            if (state.page) {
+                State.setPage(state.page);
+            }
+            if (state.data) {
+                State.setData(state.data);
+            }
+            if (state.intent) {
+                State.setIntent(state.intent);
+            }
+        }
+    }
 }

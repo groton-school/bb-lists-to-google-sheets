@@ -14,7 +14,7 @@ specifiers:
   webpack-cli: ^5.0.1
 
 dependencies:
-  '@battis/google-apps-script-helpers': github.com/battis/google-apps-script-helpers/b6cbb40d63b1cbb2e473ecaf43e75b1a6b8236e3
+  '@battis/google-apps-script-helpers': github.com/battis/google-apps-script-helpers/06b7f05600e018f49cd042cf40df4ce6048399e6
   '@types/google-apps-script': 1.0.57
 
 devDependencies:
@@ -1079,8 +1079,8 @@ packages:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
 
-  github.com/battis/google-apps-script-helpers/b6cbb40d63b1cbb2e473ecaf43e75b1a6b8236e3:
-    resolution: {tarball: https://codeload.github.com/battis/google-apps-script-helpers/tar.gz/b6cbb40d63b1cbb2e473ecaf43e75b1a6b8236e3}
+  github.com/battis/google-apps-script-helpers/06b7f05600e018f49cd042cf40df4ce6048399e6:
+    resolution: {tarball: https://codeload.github.com/battis/google-apps-script-helpers/tar.gz/06b7f05600e018f49cd042cf40df4ce6048399e6}
     name: '@battis/google-apps-script-helpers'
     version: 1.0.0
     dependencies:
