@@ -7,5 +7,4 @@ export function openSpreadsheetAction() {
     return Terse.CardService.replaceStack(homeCard(), url);
 }
 global.action_sheets_openSpreadsheet = openSpreadsheetAction;
-const OpenSpreadsheet = 'action_sheets_openSpreadsheet';
-export default OpenSpreadsheet;
+export default 'action_sheets_openSpreadsheet';

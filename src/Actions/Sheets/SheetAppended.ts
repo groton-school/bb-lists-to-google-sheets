@@ -22,5 +22,4 @@ export function sheetAppendedAction() {
     return Terse.CardService.replaceStack(sheetAppendedCard());
 }
 global.action_sheets_sheetAppended = sheetAppendedAction;
-const SheetAppended = 'action_sheets_sheetAppended';
-export default SheetAppended;
+export default 'action_sheets_sheetAppended';

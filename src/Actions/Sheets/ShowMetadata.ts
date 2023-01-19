@@ -40,5 +40,4 @@ export function showMetadataAction() {
     return Terse.CardService.pushCard(showMetadataCard());
 }
 global.action_sheets_showMetadata = showMetadataAction;
-const ShowMetadata = 'action_sheets_showMetadata';
-export default ShowMetadata;
+export default 'action_sheets_showMetadata';

@@ -114,5 +114,4 @@ export function insertDataAction(arg = null) {
     }
 }
 global.action_lists_insertData = insertDataAction;
-const InsertData = 'action_lists_insertData';
-export default InsertData;
+export default 'action_lists_insertData';

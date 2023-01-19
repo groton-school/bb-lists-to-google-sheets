@@ -1,6 +1,6 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import { PREFIX } from './Constants';
-import { List } from './SKY';
+import { ListMetadata } from './SKY/School';
 
 export enum Intent {
     CreateSpreadsheet = 'create',
@@ -104,7 +104,7 @@ export default class State {
         return Terse.PropertiesService.getUserProperty(State.LIST, JSON.parse);
     }
 
-    public static setList(list: List) {
+    public static setList(list: ListMetadata) {
         if (list) {
             return Terse.PropertiesService.setUserProperty(
                 State.LIST,
@@ -171,41 +171,46 @@ export default class State {
         }
     }
 
-    public static update({ parameters: { state = null } }) {
-        if (state) {
-            state = JSON.parse(state);
-            if (state.folder) {
-                State.setFolder(DriveApp.getFolderById(state.folder));
-            }
+    public static update(arg) {
+        if (arg) {
+            var {
+                parameters: { state },
+            } = arg;
+            if (state) {
+                state = JSON.parse(state);
+                if (state.folder) {
+                    State.setFolder(DriveApp.getFolderById(state.folder));
+                }
 
-            var spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
-            if (state.spreadsheet) {
-                spreadsheet = SpreadsheetApp.openById(state.spreadsheet);
-            }
-            var sheet: GoogleAppsScript.Spreadsheet.Sheet;
-            if (state.sheet) {
-                spreadsheet = spreadsheet || State.getSpreadsheet();
-                sheet = spreadsheet.getSheetByName(state.sheet);
-            }
-            if (state.selection) {
-                sheet = sheet || State.getSheet();
-                State.setSelection(sheet.getRange(state.selection));
-            } else if (sheet) {
-                State.setSheet(sheet);
-            } else if (spreadsheet) {
-                State.setSpreadsheet(spreadsheet);
-            }
-            if (state.list) {
-                State.setList(state.list);
-            }
-            if (state.page) {
-                State.setPage(state.page);
-            }
-            if (state.data) {
-                State.setData(state.data);
-            }
-            if (state.intent) {
-                State.setIntent(state.intent);
+                var spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
+                if (state.spreadsheet) {
+                    spreadsheet = SpreadsheetApp.openById(state.spreadsheet);
+                }
+                var sheet: GoogleAppsScript.Spreadsheet.Sheet;
+                if (state.sheet) {
+                    spreadsheet = spreadsheet || State.getSpreadsheet();
+                    sheet = spreadsheet.getSheetByName(state.sheet);
+                }
+                if (state.selection) {
+                    sheet = sheet || State.getSheet();
+                    State.setSelection(sheet.getRange(state.selection));
+                } else if (sheet) {
+                    State.setSheet(sheet);
+                } else if (spreadsheet) {
+                    State.setSpreadsheet(spreadsheet);
+                }
+                if (state.list) {
+                    State.setList(state.list);
+                }
+                if (state.page) {
+                    State.setPage(state.page);
+                }
+                if (state.data) {
+                    State.setData(state.data);
+                }
+                if (state.intent) {
+                    State.setIntent(state.intent);
+                }
             }
         }
     }

@@ -1,12 +1,12 @@
 import Lists from '../../Lists';
-import SKY, { SkyResponse } from '../../SKY';
+import School, { ResponseFormat } from '../../SKY/School';
 import State from '../../State';
 import { insertDataAction } from './InsertData';
 import { loadNextPageAction } from './LoadNextPage';
 
 export function importDataAction(arg) {
     State.update(arg);
-    State.setData(SKY.school.v1.lists(State.getList().id, SkyResponse.Array));
+    State.setData(School.lists(State.getList().id, ResponseFormat.Array));
     if (
         State.getData().length ==
         Lists.BLACKBAUD_PAGE_SIZE + 1 /* column labels */
@@ -18,5 +18,4 @@ export function importDataAction(arg) {
     }
 }
 global.action_lists_importData = importDataAction;
-const ImportData = 'action_lists_importData';
-export default ImportData;
+export default 'action_lists_importData';

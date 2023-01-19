@@ -1,6 +1,6 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import Lists from '../../Lists';
-import SKY, { SkyResponse } from '../../SKY';
+import School, { ResponseFormat } from '../../SKY/School';
 import State from '../../State';
 import { insertDataAction } from './InsertData';
 
@@ -32,9 +32,13 @@ export function loadNextPageCard() {
 
 export function loadNextPageAction() {
     State.setPage(State.getPage() + 1);
-    const data = SKY.school.v1
-        .lists(State.getList().id, SkyResponse.Array, State.getPage())
-        .slice(1); // trim off unneeded column labels
+    const data = (
+        School.lists(
+            State.getList().id,
+            ResponseFormat.Array,
+            State.getPage()
+        ) as []
+    ).slice(1); // trim off unneeded column labels
     State.appendData(data);
     if (data.length == Lists.BLACKBAUD_PAGE_SIZE) {
         return Terse.CardService.replaceStack(loadNextPageCard());
@@ -43,5 +47,4 @@ export function loadNextPageAction() {
     }
 }
 global.action_lists_loadNextPage = loadNextPageAction;
-const LoadNextPage = 'action_lists_loadNextPage';
-export default LoadNextPage;
+export default 'action_lists_loadNextPage';

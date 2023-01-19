@@ -24,5 +24,4 @@ export function confirmBreakConnectionAction() {
     return Terse.CardService.pushCard(confirmBreakConnectionCard());
 }
 global.action_sheets_confirmBreakConnection = confirmBreakConnectionAction;
-const ConfirmBreakConnection = 'action_sheets_confirmBreakConnection';
-export default ConfirmBreakConnection;
+export default 'action_sheets_confirmBreakConnection';

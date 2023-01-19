@@ -32,5 +32,4 @@ export function emptyListAction(data) {
     Terse.CardService.replaceStack(emptyListCard());
 }
 global.action_lists_emptyList = emptyListAction;
-const EmptyList = 'action_lists_emptyList';
-export default EmptyList;
+export default 'action_lists_emptyList';

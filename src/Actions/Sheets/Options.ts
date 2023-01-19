@@ -92,5 +92,4 @@ export function optionsAction() {
     return Terse.CardService.replaceStack(optionsCard());
 }
 global.action_sheets_options = optionsAction;
-const Options = 'action_sheets_options';
-export default Options;
+export default 'action_sheets_options';

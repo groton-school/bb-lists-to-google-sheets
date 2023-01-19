@@ -9,5 +9,4 @@ export function deleteMetadataAction() {
     return homeAction();
 }
 global.action_sheets_deleteMetadata = deleteMetadataAction;
-const DeleteMetadata = 'action_sheets_deleteMetadata';
-export default DeleteMetadata;
+export default 'action_sheets_deleteMetadata';

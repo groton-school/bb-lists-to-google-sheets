@@ -25,5 +25,4 @@ export function updatedAction() {
     return Terse.CardService.pushCard(updatedCard());
 }
 global.action_sheets_updated = updatedAction;
-const Updated = 'action_sheets_updated';
-export default Updated;
+export default 'action_sheets_updated';

@@ -1,6 +1,6 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import Lists from '../../Lists';
-import SKY from '../../SKY';
+import School, { ListMetadata } from '../../SKY/School';
 import State, { Intent } from '../../State';
 import ListDetail from './ListDetail';
 
@@ -17,9 +17,9 @@ export function listsCard() {
         }
         return categories;
     };
-    const lists = SKY.school.v1
-        .lists()
-        .reduce(groupCategories, { [Lists.UNCATEGORIZED]: [] });
+    const lists = (School.lists() as ListMetadata[]).reduce(groupCategories, {
+        [Lists.UNCATEGORIZED]: [],
+    });
 
     var intentBasedActionDescription;
     switch (State.getIntent()) {
@@ -77,5 +77,4 @@ export function listsAction(arg) {
     return Terse.CardService.pushCard(listsCard());
 }
 global.action_lists_lists = listsAction;
-const _Lists = 'action_lists_lists';
-export default _Lists;
+export default 'action_lists_lists';

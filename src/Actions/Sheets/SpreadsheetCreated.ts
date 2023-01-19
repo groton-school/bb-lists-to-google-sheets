@@ -29,5 +29,4 @@ export function spreadsheetCreatedAction() {
     return Terse.CardService.replaceStack(spreadsheetCreatedCard());
 }
 global.action_sheets_spreadsheetCreated = spreadsheetCreatedAction;
-const SpreadsheetCreated = 'action_sheets_spreadsheetCreated';
-export default SpreadsheetCreated;
+export default 'action_sheets_spreadsheetCreated';

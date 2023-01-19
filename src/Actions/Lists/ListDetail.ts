@@ -46,5 +46,4 @@ export function listDetailAction(arg) {
     return Terse.CardService.pushCard(listDetailCard());
 }
 global.action_lists_detail = listDetailAction;
-const ListDetail = 'action_lists_detail';
-export default ListDetail;
+export default 'action_lists_detail';

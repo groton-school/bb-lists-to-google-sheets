@@ -26,7 +26,17 @@ export function errorCard(message = 'An error occurred') {
                         )
                     )
                 )
-                .addWidget(Terse.CardService.newTextButton('Start Over', Home))
+                .addWidget(
+                    Terse.CardService.newDecoratedText(
+                        'UserProperties',
+                        JSON.stringify(
+                            PropertiesService.getUserProperties().getProperties(),
+                            null,
+                            2
+                        )
+                    )
+                )
+                .addWidget(Terse.CardService.newTextButton('Home', Home))
         )
         .build();
 }
