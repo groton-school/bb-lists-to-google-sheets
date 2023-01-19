@@ -1,6 +1,6 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import { PREFIX } from './Constants';
-import { ListMetadata } from './SKY/School';
+import { School } from './SKY';
 
 export enum Intent {
     CreateSpreadsheet = 'create',
@@ -19,7 +19,7 @@ export default class State {
     private static readonly PAGE = `${PREFIX}.State.page`;
     private static readonly INTENT = `${PREFIX}.State.intent`;
 
-    public static getFolder() {
+    public static getFolder(): GoogleAppsScript.Drive.Folder {
         return Terse.PropertiesService.getUserProperty(
             State.FOLDER,
             (id) => id && DriveApp.getFolderById(id)
@@ -36,7 +36,7 @@ export default class State {
         return Terse.PropertiesService.deleteUserProperty(State.FOLDER);
     }
 
-    public static getSpreadsheet() {
+    public static getSpreadsheet(): GoogleAppsScript.Spreadsheet.Spreadsheet {
         return Terse.PropertiesService.getUserProperty(
             State.SPREADSHEET,
             (id) => id && SpreadsheetApp.openById(id)
@@ -55,7 +55,7 @@ export default class State {
         return Terse.PropertiesService.deleteUserProperty(State.SPREADSHEET);
     }
 
-    public static getSheet() {
+    public static getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
         const spreadsheet = State.getSpreadsheet();
         if (spreadsheet) {
             return Terse.PropertiesService.getUserProperty(
@@ -78,7 +78,7 @@ export default class State {
         return Terse.PropertiesService.deleteUserProperty(State.SHEET);
     }
 
-    public static getSelection() {
+    public static getSelection(): GoogleAppsScript.Spreadsheet.Range {
         const sheet = State.getSheet();
         if (sheet) {
             return Terse.PropertiesService.getUserProperty(
@@ -100,11 +100,11 @@ export default class State {
         return Terse.PropertiesService.deleteUserProperty(State.SELECTION);
     }
 
-    public static getList() {
+    public static getList(): School.Lists.Metadata {
         return Terse.PropertiesService.getUserProperty(State.LIST, JSON.parse);
     }
 
-    public static setList(list: ListMetadata) {
+    public static setList(list: School.Lists.Metadata) {
         if (list) {
             return Terse.PropertiesService.setUserProperty(
                 State.LIST,
@@ -137,15 +137,15 @@ export default class State {
         );
     }
 
-    public static getPage() {
+    public static getPage(): number {
         return Terse.PropertiesService.getUserProperty(State.PAGE, parseInt);
     }
 
-    public static setPage(page) {
-        return Terse.PropertiesService.setUserProperty(State.PAGE, page);
+    public static setPage(page: number) {
+        return Terse.PropertiesService.setUserProperty(State.PAGE, page.toString());
     }
 
-    public static getIntent() {
+    public static getIntent(): Intent {
         return Terse.PropertiesService.getUserProperty(State.INTENT);
     }
 
@@ -165,6 +165,7 @@ export default class State {
 
         const spreadsheet = SpreadsheetApp.getActive();
         if (spreadsheet) {
+            // FIXME range is not being captured by this
             State.setSelection(
                 spreadsheet.getActiveSheet().getSelection().getActiveRange()
             );
@@ -213,5 +214,30 @@ export default class State {
                 }
             }
         }
+    }
+
+    public static toString(): string {
+        const folder = State.getFolder();
+        const intent = State.getIntent();
+        const spreadsheet = State.getSpreadsheet();
+        const sheet = State.getSheet();
+        const selection = State.getSelection();
+        const list = State.getList();
+        const page = State.getPage();
+        const data = State.getData();
+        return JSON.stringify(
+            {
+                folder: folder && folder.getId(),
+                intent,
+                spreadsheet: spreadsheet && spreadsheet.getId(),
+                sheet: sheet && sheet.getName(),
+                selection: selection && selection.getA1Notation(),
+                list,
+                page,
+                data,
+            },
+            null,
+            2
+        );
     }
 }

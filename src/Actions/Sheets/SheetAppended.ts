@@ -3,19 +3,14 @@ import State from '../../State';
 import Home from '../App/Home';
 
 export function sheetAppendedCard() {
-    return CardService.newCardBuilder()
-        .setHeader(Terse.CardService.newCardHeader(State.getSheet().getName()))
-        .addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        `The sheet "${State.getSheet().getName()}" has been appended to "${State.getSpreadsheet().getName()}" and populated with the data in "${State.getList().name
-                        }" from Blackbaud.`
-                    )
-                )
-                .addWidget(Terse.CardService.newTextButton('Done', Home))
-        )
-        .build();
+    return Terse.CardService.newCard({
+        header: State.getSheet().getName(),
+        widgets: [
+            `The sheet "${State.getSheet().getName()}" has been appended to "${State.getSpreadsheet().getName()}" and populated with the data in "${State.getList().name
+            }" from Blackbaud.`,
+            Terse.CardService.newTextButton({ text: 'Done', functionName: Home }),
+        ],
+    });
 }
 
 export function sheetAppendedAction() {

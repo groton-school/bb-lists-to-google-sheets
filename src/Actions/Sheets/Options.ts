@@ -16,74 +16,82 @@ export function optionsCard() {
     const metaList = Sheets.metadata.get(Sheets.metadata.LIST);
     if (metaList) {
         card.addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newDecoratedText(
-                        State.getSheet().getName(),
-                        `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
-                        `Last updated ${Sheets.metadata.get(Sheets.metadata.LAST_UPDATED) ||
-                        'at an unknown time'
-                        }`
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.'
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton('Update', ImportData, {
-                        state: {
-                            intent: Intent.UpdateExisting,
-                            list: Sheets.metadata.get(Sheets.metadata.LIST),
+            Terse.CardService.newCardSection({
+                widgets: [
+                    Terse.CardService.newDecoratedText({
+                        topLabel: State.getSheet().getName(),
+                        text: `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
+                        bottomLabel: `Last updated ${Sheets.metadata.get(Sheets.metadata.LAST_UPDATED) ||
+                            'at an unknown time'
+                            }`,
+                    }),
+                    'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.',
+                    Terse.CardService.newTextButton({
+                        text: 'Update',
+                        functionName: ImportData,
+                        parameters: {
+                            state: {
+                                intent: Intent.UpdateExisting,
+                                list: Sheets.metadata.get(Sheets.metadata.LIST),
+                            },
                         },
-                    })
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton('Show Metadata', ShowMetadata)
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton(
-                        'Break Connection',
-                        ConfirmBreakConnection
-                    )
-                )
+                    }),
+                    Terse.CardService.newTextButton({
+                        text: 'Show Metadata',
+                        functionName: ShowMetadata,
+                    }),
+                    Terse.CardService.newTextButton({
+                        text: 'Break Connection',
+                        functionName: ConfirmBreakConnection,
+                    }),
+                ],
+            })
         );
     } else {
         card.addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newDecoratedText(
-                        State.getSheet().getName(),
-                        `Replace the currently selected cells (${State.getSheet()
+            Terse.CardService.newCardSection({
+                widgets: [
+                    Terse.CardService.newDecoratedText({
+                        topLabel: State.getSheet().getName(),
+                        text: `Replace the currently selected cells (${State.getSheet()
                             .getSelection()
                             .getActiveRange()
-                            .getA1Notation()}) in the sheet "${State.getSheet().getName()}" with data from Blackbaud`
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton('Replace Selection', Lists, {
-                        state: {
-                            intent: Intent.ReplaceSelection,
-                            selection: State.getSheet().getSelection().getActiveRange(),
+                            .getA1Notation()}) in the sheet "${State.getSheet().getName()}" with data from Blackbaud`,
+                    }),
+                    Terse.CardService.newTextButton({
+                        text: 'Replace Selection',
+                        functionName: Lists,
+                        parameters: {
+                            state: {
+                                intent: Intent.ReplaceSelection,
+                                selection: State.getSheet().getSelection().getActiveRange(),
+                            },
                         },
-                    })
-                )
+                    }),
+                ],
+            })
         );
     }
     return card
         .addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newTextButton('Append New Sheet', Lists, {
-                        state: { intent: Intent.AppendSheet },
-                    })
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton('New Spreadsheet', Lists, {
-                        state: { intent: Intent.CreateSpreadsheet },
-                    })
-                )
+            Terse.CardService.newCardSection({
+                widgets: [
+                    Terse.CardService.newTextButton({
+                        text: 'Append New Sheet',
+                        functionName: Lists,
+                        parameters: {
+                            state: { intent: Intent.AppendSheet },
+                        },
+                    }),
+                    Terse.CardService.newTextButton({
+                        text: 'New Spreadsheet',
+                        functionName: Lists,
+                        parameters: {
+                            state: { intent: Intent.CreateSpreadsheet },
+                        },
+                    }),
+                ],
+            })
         )
         .build();
 }

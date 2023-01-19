@@ -13,32 +13,27 @@ export function listDetailCard() {
             break;
     }
 
-    return CardService.newCardBuilder()
-        .setHeader(Terse.CardService.newCardHeader(State.getList().name))
-        .addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newDecoratedText(
-                        `${State.getList().type} List`,
-                        State.getList().description
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newDecoratedText(
-                        `Created by ${State.getList().created_by} ${new Date(
-                            State.getList().created
-                        ).toLocaleString()}`,
-                        null,
-                        `Last modified ${new Date(
-                            State.getList().last_modified
-                        ).toLocaleString()}`
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextButton(buttonNameBasedOnIntent, ImportData)
-                )
-        )
-        .build();
+    return Terse.CardService.newCard({
+        header: State.getList().name,
+        widgets: [
+            Terse.CardService.newDecoratedText({
+                topLabel: `${State.getList().type} List`,
+                text: State.getList().description,
+            }),
+            Terse.CardService.newDecoratedText({
+                topLabel: `Created by ${State.getList().created_by} ${new Date(
+                    State.getList().created
+                ).toLocaleString()}`,
+                bottomLabel: `Last modified ${new Date(
+                    State.getList().last_modified
+                ).toLocaleString()}`,
+            }),
+            Terse.CardService.newTextButton({
+                text: buttonNameBasedOnIntent,
+                functionName: ImportData,
+            }),
+        ],
+    });
 }
 
 export function listDetailAction(arg) {

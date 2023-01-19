@@ -1,7 +1,17 @@
 import { Terse } from '@battis/google-apps-script-helpers';
 import { PREFIX } from '../Constants';
 
+export namespace Options {
+    export enum ResponseFormat {
+        JSON,
+        Array,
+        Raw,
+    }
+}
+
 export default class ServiceManager {
+    private static lastResponse = null;
+
     public static getService() {
         return OAuth2.createService(`${PREFIX}.SKY`)
             .setAuthorizationBaseUrl('https://oauth2.sky.blackbaud.com/authorization')
@@ -34,20 +44,22 @@ export default class ServiceManager {
             headers['Bb-Api-Subscription-Key'] =
                 Terse.PropertiesService.getScriptProperty('SKY_ACCESS_KEY');
             headers['Authorization'] = `Bearer ${service.getAccessToken()}`;
-            const response = UrlFetchApp.fetch(url, {
+            ServiceManager.lastResponse = UrlFetchApp.fetch(url, {
                 method,
                 headers,
                 ...fetchParams,
                 muteHttpExceptions: true,
             });
-            const code = response.getResponseCode();
+            const code = ServiceManager.lastResponse.getResponseCode();
             if (code >= 200 && code < 300) {
-                return JSON.parse(response.getContentText('utf-8'));
+                return JSON.parse(ServiceManager.lastResponse.getContentText('utf-8'));
             } else if (code == 401 || code == 403) {
                 maybeAuthorized = false;
             } else {
                 console.error(
-                    `API server error (${code}): ${response.getContentText('utf-8')}`
+                    `API server error (${code}): ${ServiceManager.lastResponse.getContentText(
+                        'utf-8'
+                    )}`
                 );
                 throw `API server error ${code}`;
             }
@@ -60,28 +72,25 @@ export default class ServiceManager {
         }
     }
 
+    public static getLastResponse() {
+        return ServiceManager.lastResponse;
+    }
+
     public static authorizationCard() {
         return [
-            CardService.newCardBuilder()
-                .setHeader(Terse.CardService.newCardHeader('Authorization Required'))
-                .addSection(
-                    CardService.newCardSection()
-                        .addWidget(
-                            Terse.CardService.newTextParagraph(
-                                'This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.'
+            Terse.CardService.newCard({
+                header: 'Authorization Required',
+                widgets: [
+                    'This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.',
+                    CardService.newTextButton()
+                        .setText('Authorize')
+                        .setAuthorizationAction(
+                            CardService.newAuthorizationAction().setAuthorizationUrl(
+                                ServiceManager.getService().getAuthorizationUrl()
                             )
-                        )
-                        .addWidget(
-                            CardService.newTextButton()
-                                .setText('Authorize')
-                                .setAuthorizationAction(
-                                    CardService.newAuthorizationAction().setAuthorizationUrl(
-                                        ServiceManager.getService().getAuthorizationUrl()
-                                    )
-                                )
-                        )
-                )
-                .build(),
+                        ),
+                ],
+            }),
         ];
     }
 

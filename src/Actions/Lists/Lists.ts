@@ -1,6 +1,6 @@
 import { Terse } from '@battis/google-apps-script-helpers';
-import Lists from '../../Lists';
-import School, { ListMetadata } from '../../SKY/School';
+import { UNCATEGORIZED } from '../../Constants';
+import SKY, { School } from '../../SKY';
 import State, { Intent } from '../../State';
 import ListDetail from './ListDetail';
 
@@ -8,7 +8,7 @@ export function listsCard() {
     const groupCategories = (categories, list) => {
         if (list.id > 0) {
             if (!list.category) {
-                list.category = Lists.UNCATEGORIZED;
+                list.category = UNCATEGORIZED;
             }
             if (!categories[list.category]) {
                 categories[list.category] = [];
@@ -17,11 +17,14 @@ export function listsCard() {
         }
         return categories;
     };
-    const lists = (School.lists() as ListMetadata[]).reduce(groupCategories, {
-        [Lists.UNCATEGORIZED]: [],
-    });
+    const lists = (SKY.School.lists() as School.Lists.Metadata[]).reduce(
+        groupCategories,
+        {
+            [UNCATEGORIZED]: [],
+        }
+    );
 
-    var intentBasedActionDescription;
+    var intentBasedActionDescription: string;
     switch (State.getIntent()) {
         case Intent.AppendSheet:
             intentBasedActionDescription = `a sheet appended to "${State.getSpreadsheet().getName()}"`;
@@ -35,17 +38,17 @@ export function listsCard() {
     }
 
     const card = CardService.newCardBuilder().addSection(
-        CardService.newCardSection().addWidget(
-            Terse.CardService.newTextParagraph(
-                `Choose the list that you would like to import from Blackbaud into ${intentBasedActionDescription}.`
-            )
-        )
+        Terse.CardService.newCardSection({
+            widgets: [
+                `Choose the list that you would like to import from Blackbaud into ${intentBasedActionDescription}.`,
+            ],
+        })
     );
 
     const sortCategoriesWithUncategorizedLast = (a, b) => {
-        if (a == Lists.UNCATEGORIZED) {
+        if (a == UNCATEGORIZED) {
             return 1;
-        } else if (b == Lists.UNCATEGORIZED) {
+        } else if (b == UNCATEGORIZED) {
             return -1;
         } else {
             return a.localeCompare(b);
@@ -55,19 +58,23 @@ export function listsCard() {
     for (const category of Object.getOwnPropertyNames(lists).sort(
         sortCategoriesWithUncategorizedLast
     )) {
-        const section = CardService.newCardSection().setHeader(
-            category == Lists.UNCATEGORIZED ? 'Uncategorized' : category
+        card.addSection(
+            Terse.CardService.newCardSection({
+                header: category === UNCATEGORIZED ? 'Uncategorized' : category,
+                widgets: lists[category].map((list) =>
+                    Terse.CardService.newDecoratedText({
+                        text: list.name,
+                    }).setOnClickAction(
+                        Terse.CardService.newAction({
+                            functionName: ListDetail,
+                            parameters: {
+                                state: { list },
+                            },
+                        })
+                    )
+                ),
+            })
         );
-        for (const list of lists[category]) {
-            section.addWidget(
-                Terse.CardService.newDecoratedText(null, list.name).setOnClickAction(
-                    Terse.CardService.newAction(ListDetail, {
-                        state: { list },
-                    })
-                )
-            );
-        }
-        card.addSection(section);
     }
     return card.build();
 }

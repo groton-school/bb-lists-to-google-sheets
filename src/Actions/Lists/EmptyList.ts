@@ -3,29 +3,22 @@ import State from '../../State';
 import Home from '../App/Home';
 
 export function emptyListCard() {
-    return CardService.newCardBuilder()
-        .setHeader(Terse.CardService.newCardHeader(State.getList().name))
-        .addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        JSON.stringify(State.getList(), null, 2)
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        JSON.stringify(State.getData(), null, 2)
-                    )
-                )
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        `No data was returned in the list "${State.getList().name
-                        }" so no sheet was created.`
-                    )
-                )
-                .addWidget(Terse.CardService.newTextButton('Go Home', Home))
-        )
-        .build();
+    return Terse.CardService.newCard({
+        header: State.getList().name,
+        widgets: [
+            `No data was returned in the list "${State.getList().name
+            }" so no sheet was created.`,
+            Terse.CardService.newDecoratedText({
+                topLabel: 'List',
+                text: JSON.stringify(State.getList(), null, 2),
+            }),
+            Terse.CardService.newDecoratedText({
+                topLabel: 'Data',
+                text: JSON.stringify(State.getData(), null, 2),
+            }),
+            Terse.CardService.newTextButton({ text: 'Go Home', functionName: Home }),
+        ],
+    });
 }
 
 export function emptyListAction(data) {

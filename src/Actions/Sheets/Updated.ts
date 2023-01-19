@@ -4,21 +4,14 @@ import State from '../../State';
 import Home from '../App/Home';
 
 export function updatedCard() {
-    return CardService.newCardBuilder()
-        .setHeader(
-            Terse.CardService.newCardHeader(`${State.getSheet().getName()} Updated`)
-        )
-        .addSection(
-            CardService.newCardSection()
-                .addWidget(
-                    Terse.CardService.newTextParagraph(
-                        `The sheet "${State.getSheet().getName()}" of "${State.getSpreadsheet().getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST).name
-                        }" in Blackbaud.`
-                    )
-                )
-                .addWidget(Terse.CardService.newTextButton('Done', Home))
-        )
-        .build();
+    return Terse.CardService.newCard({
+        header: `${State.getSheet().getName()} Updated`,
+        widgets: [
+            `The sheet "${State.getSheet().getName()}" of "${State.getSpreadsheet().getName()}" has been updated with the current data from "${Sheets.metadata.get(Sheets.metadata.LIST).name
+            }" in Blackbaud.`,
+            Terse.CardService.newTextButton({ text: 'Done', functionName: Home }),
+        ],
+    });
 }
 
 export function updatedAction() {

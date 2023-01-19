@@ -5,7 +5,6 @@ export default class Sheets {
     public static metadata = class {
         public static readonly LIST = `${PREFIX}.list`;
         public static readonly RANGE = `${PREFIX}.range`;
-        public static readonly NAME = `${PREFIX}.name`;
         public static readonly LAST_UPDATED = `${PREFIX}.lastUpdated`;
 
         public static get(key, sheet = null) {

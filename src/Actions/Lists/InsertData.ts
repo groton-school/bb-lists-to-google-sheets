@@ -1,23 +1,23 @@
-import Lists from '../../Lists';
 import Sheets from '../../Sheets';
+import SKY from '../../SKY';
 import State, { Intent } from '../../State';
 import { sheetAppendedAction } from '../Sheets/SheetAppended';
 import { spreadsheetCreatedAction } from '../Sheets/SpreadsheetCreated';
 import { updatedAction } from '../Sheets/Updated';
-import EmptyList from './EmptyList';
+import { emptyListAction } from './EmptyList';
 
 export function insertDataAction(arg = null) {
     State.update(arg);
     const data = State.getData();
 
     if (!data || data.length == 0) {
-        return EmptyList;
+        return emptyListAction(SKY.ServiceManager.getLastResponse());
     }
 
     var range = null;
     switch (State.getIntent()) {
         case Intent.AppendSheet:
-            State.setSheet(State.getSpreadsheet().insertSheet());
+            const sheet = State.getSpreadsheet().insertSheet();
             range = Sheets.adjustRange(
                 {
                     row: 1,
@@ -26,7 +26,7 @@ export function insertDataAction(arg = null) {
                     numColumns: data[0].length,
                 },
                 null,
-                State.getSheet()
+                sheet
             );
             break;
         case Intent.ReplaceSelection:
@@ -57,6 +57,7 @@ export function insertDataAction(arg = null) {
             State.setSpreadsheet(
                 SpreadsheetApp.create(State.getList().name, data.length, data[0].length)
             );
+            // FIXME once again not creating in desired folder
             if (State.getFolder()) {
                 DriveApp.getFileById(State.getSpreadsheet().getId()).moveTo(
                     State.getFolder()
@@ -87,29 +88,26 @@ export function insertDataAction(arg = null) {
 
     switch (State.getIntent()) {
         case Intent.ReplaceSelection:
-            Sheets.metadata.set(
-                Sheets.metadata.NAME,
-                `${range.getSheet().getName()}-existing`,
-                range.getSheet()
-            );
             return updatedAction();
         case Intent.UpdateExisting:
-            if (
-                range.getSheet().getName() == Sheets.metadata.get(Sheets.metadata.NAME)
-            ) {
-                Lists.setSheetName(range.getSheet());
-            }
             return updatedAction();
         case Intent.AppendSheet:
             range.getSheet().setFrozenRows(1);
-            Lists.setSheetName(range.getSheet(), timestamp);
+            const baseName = State.getList().name;
+            var name = baseName;
+            const spreadsheet = range.getSheet().getParent();
+            for (var i = 1; spreadsheet.getSheetByName(name); i++) {
+                name = `${baseName}${i}`; // I don't like this format, but it mirrors Sheets naming conventions
+            }
+            range.getSheet().setName(name);
+            State.setSheet(range.getSheet());
             // TODO why isn't the appended sheet made active?
             State.getSpreadsheet().setActiveSheet(range.getSheet());
             return sheetAppendedAction();
         case Intent.CreateSpreadsheet:
         default:
             range.getSheet().setFrozenRows(1);
-            Lists.setSheetName(range.getSheet(), timestamp);
+            range.getSheet().setName(State.getList().name);
             return spreadsheetCreatedAction();
     }
 }

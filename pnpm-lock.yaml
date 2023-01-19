@@ -14,7 +14,7 @@ specifiers:
   webpack-cli: ^5.0.1
 
 dependencies:
-  '@battis/google-apps-script-helpers': github.com/battis/google-apps-script-helpers/06b7f05600e018f49cd042cf40df4ce6048399e6
+  '@battis/google-apps-script-helpers': github.com/battis/google-apps-script-helpers/86768311879af5db3647fba25f19cb8e0d68aa02
   '@types/google-apps-script': 1.0.57
 
 devDependencies:
@@ -322,7 +322,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001445
+      caniuse-lite: 1.0.30001446
       electron-to-chromium: 1.4.284
       node-releases: 2.0.8
       update-browserslist-db: 1.0.10_browserslist@4.21.4
@@ -332,8 +332,8 @@ packages:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
     dev: true
 
-  /caniuse-lite/1.0.30001445:
-    resolution: {integrity: sha512-8sdQIdMztYmzfTMO6KfLny878Ln9c2M0fc7EH60IjlP4Dc4PiCy7K2Vl3ITmWgOyPgVQKa5x+UP/KqFsxj4mBg==}
+  /caniuse-lite/1.0.30001446:
+    resolution: {integrity: sha512-fEoga4PrImGcwUUGEol/PoFCSBnSkA9drgdkxXkJLsUBOnJ8rs3zDv6ApqYXGQFOyMPsjh79naWhF4DAxbF8rw==}
     dev: true
 
   /chalk/4.1.2:
@@ -750,8 +750,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /punycode/2.2.0:
-    resolution: {integrity: sha512-LN6QV1IJ9ZhxWTNdktaPClrNfp8xdSAYS0Zk2ddX7XsXZAxckMHPCBcHRo0cTcEIgYPRiGEkmji3Idkh2yFtYw==}
+  /punycode/2.2.2:
+    resolution: {integrity: sha512-vKAcKbHEGA3cKbkNWwsA9MjHgIg4/X/xO/PnVQ/Pxt5eNC8/F726fGNlUlwwPej7NkmTg9OBWP4ovYvtdPtmXw==}
     engines: {node: '>=6'}
     dev: true
 
@@ -960,7 +960,7 @@ packages:
   /uri-js/4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
-      punycode: 2.2.0
+      punycode: 2.2.2
     dev: true
 
   /watchpack/2.4.0:
@@ -1079,8 +1079,8 @@ packages:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
 
-  github.com/battis/google-apps-script-helpers/06b7f05600e018f49cd042cf40df4ce6048399e6:
-    resolution: {tarball: https://codeload.github.com/battis/google-apps-script-helpers/tar.gz/06b7f05600e018f49cd042cf40df4ce6048399e6}
+  github.com/battis/google-apps-script-helpers/86768311879af5db3647fba25f19cb8e0d68aa02:
+    resolution: {tarball: https://codeload.github.com/battis/google-apps-script-helpers/tar.gz/86768311879af5db3647fba25f19cb8e0d68aa02}
     name: '@battis/google-apps-script-helpers'
     version: 1.0.0
     dependencies:

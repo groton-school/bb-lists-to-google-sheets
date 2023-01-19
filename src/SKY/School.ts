@@ -1,30 +1,33 @@
-import ServiceManager from './ServiceManager';
+import ServiceManager, { Options } from './ServiceManager';
 
-export enum ResponseFormat {
-    JSON,
-    Array,
-    Raw,
+export namespace Lists {
+    export type Metadata = {
+        id: number;
+        name: string;
+        type: 'Basic' | 'Advanced';
+        description: string;
+        category: string;
+        created_by: string;
+        created: string;
+        last_modified: string;
+    };
+    export namespace Data {
+        type Column = { name: string; value: string };
+        type Row = { columns: Column[] };
+        export type List = {
+            count: number;
+            page: number;
+            results: { rows: Row[] };
+        };
+    }
 }
 
-export type ListMetadata = {
-    id: number;
-    name: string;
-    type: 'Basic' | 'Advanced';
-    description: string;
-    category: string;
-    created_by: string;
-    created: string;
-    last_modified: string;
-};
-
-type ColumnData = { name: string; value: string };
-type RowData = { columns: ColumnData[] };
-type ListData = { count: number; page: number; results: { rows: RowData[] } };
+const ResponseFormat = Options.ResponseFormat;
 
 export default class School {
     public static lists(
-        id?: string,
-        format: ResponseFormat = ResponseFormat.JSON,
+        id?: number,
+        format: Options.ResponseFormat = ResponseFormat.JSON,
         page?: number
     ) {
         if (id) {
@@ -34,10 +37,10 @@ export default class School {
         }
     }
 
-    private static listOfLists(format: ResponseFormat) {
+    private static listOfLists(format: Options.ResponseFormat) {
         const response = ServiceManager.makeRequest(
             'https://api.sky.blackbaud.com/school/v1/lists'
-        ) as { count: number; value: ListMetadata[] };
+        ) as { count: number; value: Lists.Metadata[] };
         switch (format) {
             case ResponseFormat.JSON:
                 return response.value;
@@ -46,10 +49,14 @@ export default class School {
         }
     }
 
-    private static listContent(id: string, format: ResponseFormat, page = 1) {
+    private static listContent(
+        id: number,
+        format: Options.ResponseFormat,
+        page = 1
+    ) {
         const response = ServiceManager.makeRequest(
             `https://api.sky.blackbaud.com/school/v1/lists/advanced/${id}?page=${page}`
-        ) as ListData;
+        ) as Lists.Data.List;
         switch (format) {
             case ResponseFormat.JSON:
                 return response.results.rows.map((row) =>
@@ -59,6 +66,9 @@ export default class School {
                     }, {})
                 );
             case ResponseFormat.Array:
+                if (response.count == 0) {
+                    return [];
+                }
                 const [first, ...rows] = response.results.rows;
                 const arr = [
                     first.columns.reduce((arr, { name }): string[] => {
