@@ -4,7 +4,6 @@ import State, { Intent } from '../../State';
 import ImportData from '../Lists/ImportData';
 import Lists from '../Lists/Lists';
 import ConfirmBreakConnection from './ConfirmBreakConnection';
-import ShowMetadata from './ShowMetadata';
 
 export function optionsCard() {
     const card = CardService.newCardBuilder().setHeader(
@@ -37,10 +36,6 @@ export function optionsCard() {
                         },
                     }),
                     Terse.CardService.newTextButton({
-                        text: 'Show Metadata',
-                        functionName: ShowMetadata,
-                    }),
-                    Terse.CardService.newTextButton({
                         text: 'Break Connection',
                         functionName: ConfirmBreakConnection,
                     }),
@@ -53,10 +48,7 @@ export function optionsCard() {
                 widgets: [
                     Terse.CardService.newDecoratedText({
                         topLabel: State.getSheet().getName(),
-                        text: `Replace the currently selected cells (${State.getSheet()
-                            .getSelection()
-                            .getActiveRange()
-                            .getA1Notation()}) in the sheet "${State.getSheet().getName()}" with data from Blackbaud`,
+                        text: `Select a range in the sheet "${State.getSheet().getName()}" to replace with data from Blackbaud`,
                     }),
                     Terse.CardService.newTextButton({
                         text: 'Replace Selection',
@@ -64,7 +56,6 @@ export function optionsCard() {
                         parameters: {
                             state: {
                                 intent: Intent.ReplaceSelection,
-                                selection: State.getSheet().getSelection().getActiveRange(),
                             },
                         },
                     }),

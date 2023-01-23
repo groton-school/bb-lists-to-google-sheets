@@ -7,12 +7,12 @@ export function loadNextPageCard() {
     return Terse.CardService.newCard({
         header: State.getList().name,
         widgets: [
-            'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts, human interaction is required to load large data lists from Blackbaud.',
+            'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts), human interaction is required to load large data lists from Blackbaud.',
             `${State.getData().length - 1} records have been loaded from "${State.getList().name
             }" so far.`,
             Terse.CardService.newTextButton({
                 text: `Load Page ${State.getPage() + 1}`,
-                functionName: global.action_lists_loadNextPage,
+                functionName: 'action_lists_loadNextPage',
             }),
         ],
     });

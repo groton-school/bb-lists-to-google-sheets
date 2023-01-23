@@ -37,10 +37,15 @@ export default class State {
     }
 
     public static getSpreadsheet(): GoogleAppsScript.Spreadsheet.Spreadsheet {
-        return Terse.PropertiesService.getUserProperty(
+        var spreadsheet = Terse.PropertiesService.getUserProperty(
             State.SPREADSHEET,
             (id) => id && SpreadsheetApp.openById(id)
         );
+        if (!spreadsheet) {
+            spreadsheet = SpreadsheetApp.getActive();
+            this.setSpreadsheet(spreadsheet);
+        }
+        return spreadsheet;
     }
 
     public static setSpreadsheet(
@@ -58,10 +63,15 @@ export default class State {
     public static getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
         const spreadsheet = State.getSpreadsheet();
         if (spreadsheet) {
-            return Terse.PropertiesService.getUserProperty(
+            var sheet = Terse.PropertiesService.getUserProperty(
                 State.SHEET,
                 (name) => name && spreadsheet.getSheetByName(name)
             );
+            if (!sheet) {
+                sheet = spreadsheet.getActiveSheet();
+                this.setSheet(sheet);
+            }
+            return sheet;
         }
         return null;
     }
@@ -81,10 +91,15 @@ export default class State {
     public static getSelection(): GoogleAppsScript.Spreadsheet.Range {
         const sheet = State.getSheet();
         if (sheet) {
-            return Terse.PropertiesService.getUserProperty(
+            var selection = Terse.PropertiesService.getUserProperty(
                 State.SELECTION,
                 (a1notation) => a1notation && sheet.getRange(a1notation)
             );
+            if (!selection) {
+                selection = sheet.getActiveRange();
+                this.setSelection(selection);
+            }
+            return selection;
         }
         return null;
     }
@@ -131,10 +146,7 @@ export default class State {
     public static appendData(page) {
         const data = State.getData() || [];
         data.push(...page);
-        return Terse.PropertiesService.setUserProperty(
-            State.DATA,
-            JSON.stringify(data)
-        );
+        State.setData(data);
     }
 
     public static getPage(): number {
@@ -162,14 +174,6 @@ export default class State {
         Terse.PropertiesService.deleteUserProperty(State.DATA);
         Terse.PropertiesService.deleteUserProperty(State.PAGE);
         State.setIntent(Intent.CreateSpreadsheet);
-
-        const spreadsheet = SpreadsheetApp.getActive();
-        if (spreadsheet) {
-            // FIXME range is not being captured by this
-            State.setSelection(
-                spreadsheet.getActiveSheet().getSelection().getActiveRange()
-            );
-        }
     }
 
     public static update(arg) {

@@ -1,7 +1,8 @@
+import { Terse } from '@battis/google-apps-script-helpers';
 import SKY from '../../SKY';
 import State from '../../State';
 import { insertDataAction } from './InsertData';
-import { loadNextPageAction } from './LoadNextPage';
+import { loadNextPageCard } from './LoadNextPage';
 
 export function importDataAction(arg) {
     State.update(arg);
@@ -10,7 +11,7 @@ export function importDataAction(arg) {
     );
     if (State.getData().length == SKY.PAGE_SIZE + 1 /* column labels */) {
         State.setPage(1);
-        return loadNextPageAction();
+        return Terse.CardService.replaceStack(loadNextPageCard());
     } else {
         return insertDataAction();
     }

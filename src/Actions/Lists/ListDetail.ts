@@ -9,7 +9,7 @@ export function listDetailCard() {
             buttonNameBasedOnIntent = 'Append Sheet';
             break;
         case Intent.ReplaceSelection:
-            buttonNameBasedOnIntent = 'Replace Selection';
+            buttonNameBasedOnIntent = `Replace ${State.getSelection().getA1Notation()}`;
             break;
     }
 
