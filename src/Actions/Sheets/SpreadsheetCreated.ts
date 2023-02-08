@@ -1,5 +1,5 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import State from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as State from '../../State';
 import OpenSpreadsheet from './OpenSpreadsheet';
 
 export function spreadsheetCreatedCard() {

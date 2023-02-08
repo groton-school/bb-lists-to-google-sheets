@@ -1,6 +1,6 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import SKY from '../../SKY';
-import State from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as SKY from '../../SKY';
+import * as State from '../../State';
 import { insertDataAction } from './InsertData';
 
 export function loadNextPageCard() {
@@ -21,9 +21,9 @@ export function loadNextPageCard() {
 export function loadNextPageAction() {
     State.setPage(State.getPage() + 1);
     const data = (
-        SKY.School.lists(
+        SKY.School.Lists.get(
             State.getList().id,
-            SKY.Options.ResponseFormat.Array,
+            SKY.ServiceManager.ResponseFormat.Array,
             State.getPage()
         ) as []
     ).slice(1); // trim off unneeded column labels

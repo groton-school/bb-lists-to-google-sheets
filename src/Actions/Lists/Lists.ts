@@ -1,7 +1,7 @@
-import { Terse } from '@battis/google-apps-script-helpers';
+import { Terse } from '@battis/gas-lighter';
 import { UNCATEGORIZED } from '../../Constants';
-import SKY, { School } from '../../SKY';
-import State, { Intent } from '../../State';
+import * as SKY from '../../SKY';
+import * as State from '../../State';
 import ListDetail from './ListDetail';
 
 export function listsCard() {
@@ -17,7 +17,7 @@ export function listsCard() {
         }
         return categories;
     };
-    const lists = (SKY.School.lists() as School.Lists.Metadata[]).reduce(
+    const lists = (SKY.School.Lists.get() as SKY.School.Lists.Metadata[]).reduce(
         groupCategories,
         {
             [UNCATEGORIZED]: [],
@@ -26,13 +26,13 @@ export function listsCard() {
 
     var intentBasedActionDescription: string;
     switch (State.getIntent()) {
-        case Intent.AppendSheet:
+        case State.Intent.AppendSheet:
             intentBasedActionDescription = `a sheet appended to "${State.getSpreadsheet().getName()}"`;
             break;
-        case Intent.ReplaceSelection:
+        case State.Intent.ReplaceSelection:
             intentBasedActionDescription = `the sheet "${State.getSheet().getName()}", replacing the current selection (${State.getSelection().getA1Notation()})`;
             break;
-        case Intent.CreateSpreadsheet:
+        case State.Intent.CreateSpreadsheet:
         default:
             intentBasedActionDescription = 'a new spreadsheet';
     }

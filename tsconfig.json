@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "lib": ["esnext"],
+    "lib": ["esnext", "es5"],
     "experimentalDecorators": true,
 
     "noImplicitAny": false,

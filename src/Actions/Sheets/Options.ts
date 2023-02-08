@@ -1,6 +1,6 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import Sheets from '../../Sheets';
-import State, { Intent } from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as Sheets from '../../Sheets';
+import * as State from '../../State';
 import ImportData from '../Lists/ImportData';
 import Lists from '../Lists/Lists';
 import ConfirmBreakConnection from './ConfirmBreakConnection';
@@ -12,7 +12,7 @@ export function optionsCard() {
         )
     );
 
-    const metaList = Sheets.metadata.get(Sheets.metadata.LIST);
+    const metaList = Sheets.Metadata.getList();
     if (metaList) {
         card.addSection(
             Terse.CardService.newCardSection({
@@ -20,8 +20,7 @@ export function optionsCard() {
                     Terse.CardService.newDecoratedText({
                         topLabel: State.getSheet().getName(),
                         text: `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
-                        bottomLabel: `Last updated ${Sheets.metadata.get(Sheets.metadata.LAST_UPDATED) ||
-                            'at an unknown time'
+                        bottomLabel: `Last updated ${Sheets.Metadata.getLastUpdated() || 'at an unknown time'
                             }`,
                     }),
                     'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.',
@@ -30,8 +29,8 @@ export function optionsCard() {
                         functionName: ImportData,
                         parameters: {
                             state: {
-                                intent: Intent.UpdateExisting,
-                                list: Sheets.metadata.get(Sheets.metadata.LIST),
+                                intent: State.Intent.UpdateExisting,
+                                list: Sheets.Metadata.getList(),
                             },
                         },
                     }),
@@ -55,7 +54,7 @@ export function optionsCard() {
                         functionName: Lists,
                         parameters: {
                             state: {
-                                intent: Intent.ReplaceSelection,
+                                intent: State.Intent.ReplaceSelection,
                             },
                         },
                     }),
@@ -71,14 +70,14 @@ export function optionsCard() {
                         text: 'Append New Sheet',
                         functionName: Lists,
                         parameters: {
-                            state: { intent: Intent.AppendSheet },
+                            state: { intent: State.Intent.AppendSheet },
                         },
                     }),
                     Terse.CardService.newTextButton({
                         text: 'New Spreadsheet',
                         functionName: Lists,
                         parameters: {
-                            state: { intent: Intent.CreateSpreadsheet },
+                            state: { intent: State.Intent.CreateSpreadsheet },
                         },
                     }),
                 ],

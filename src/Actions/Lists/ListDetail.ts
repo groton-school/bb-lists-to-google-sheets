@@ -1,14 +1,14 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import State, { Intent } from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as State from '../../State';
 import ImportData from './ImportData';
 
 export function listDetailCard() {
     var buttonNameBasedOnIntent = 'Create Spreadsheet';
     switch (State.getIntent()) {
-        case Intent.AppendSheet:
+        case State.Intent.AppendSheet:
             buttonNameBasedOnIntent = 'Append Sheet';
             break;
-        case Intent.ReplaceSelection:
+        case State.Intent.ReplaceSelection:
             buttonNameBasedOnIntent = `Replace ${State.getSelection().getA1Notation()}`;
             break;
     }

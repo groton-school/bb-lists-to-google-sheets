@@ -1,6 +1,6 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import Sheets from '../../Sheets';
-import State from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as Sheets from '../../Sheets';
+import * as State from '../../State';
 import Home from '../App/Home';
 
 export function showMetadataCard() {
@@ -11,11 +11,9 @@ export function showMetadataCard() {
                 topLabel: `${State.getSheet().getName()} Deeloper Metadata`,
                 text: JSON.stringify(
                     {
-                        [Sheets.metadata.LIST]: Sheets.metadata.get(Sheets.metadata.LIST),
-                        [Sheets.metadata.RANGE]: Sheets.metadata.get(Sheets.metadata.RANGE),
-                        [Sheets.metadata.LAST_UPDATED]: Sheets.metadata.get(
-                            Sheets.metadata.LAST_UPDATED
-                        ),
+                        list: Sheets.Metadata.getList(),
+                        range: Sheets.Metadata.getRange(),
+                        lastUpdate: Sheets.Metadata.getLastUpdated(),
                     },
                     null,
                     2

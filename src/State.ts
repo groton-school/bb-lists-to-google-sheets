@@ -1,6 +1,6 @@
-import { Terse } from '@battis/google-apps-script-helpers';
+import { Terse } from '@battis/gas-lighter';
 import { PREFIX } from './Constants';
-import { School } from './SKY';
+import * as SKY from './SKY';
 
 export enum Intent {
     CreateSpreadsheet = 'create',
@@ -9,239 +9,196 @@ export enum Intent {
     UpdateExisting = 'update',
 }
 
-export default class State {
-    private static readonly FOLDER = `${PREFIX}.State.folder`;
-    private static readonly SPREADSHEET = `${PREFIX}.State.spreadsheet`;
-    private static readonly SHEET = `${PREFIX}.State.sheet`;
-    private static readonly SELECTION = `${PREFIX}.State.selection`;
-    private static readonly LIST = `${PREFIX}.State.list`;
-    private static readonly DATA = `${PREFIX}.State.data`;
-    private static readonly PAGE = `${PREFIX}.State.page`;
-    private static readonly INTENT = `${PREFIX}.State.intent`;
+const FOLDER = `${PREFIX}.State.folder`;
+const SPREADSHEET = `${PREFIX}.State.spreadsheet`;
+const SHEET = `${PREFIX}.State.sheet`;
+const SELECTION = `${PREFIX}.State.selection`;
+const LIST = `${PREFIX}.State.list`;
+const INTENT = `${PREFIX}.State.intent`;
 
-    public static getFolder(): GoogleAppsScript.Drive.Folder {
-        return Terse.PropertiesService.getUserProperty(
-            State.FOLDER,
-            (id) => id && DriveApp.getFolderById(id)
-        );
+// FIXME data and page should be stored in SKY.ServiceManaager, not State
+const DATA = `${PREFIX}.State.data`;
+const PAGE = `${PREFIX}.State.page`;
+
+export function getFolder() {
+    const id = Terse.PropertiesService.getUserProperty(FOLDER);
+    let folder = null;
+    if (id) {
+        folder = DriveApp.getFolderById(id);
     }
+    return folder;
+}
 
-    public static setFolder(folder: GoogleAppsScript.Drive.Folder) {
-        if (folder) {
-            return Terse.PropertiesService.setUserProperty(
-                State.FOLDER,
-                folder.getId()
-            );
+export function setFolder(folder: GoogleAppsScript.Drive.Folder) {
+    const id = folder && folder.getId();
+    return Terse.PropertiesService.setUserProperty(FOLDER, id);
+}
+
+export function getSpreadsheet(): GoogleAppsScript.Spreadsheet.Spreadsheet {
+    const id = Terse.PropertiesService.getUserProperty(SPREADSHEET);
+    let spreadsheet = null;
+    if (id) {
+        spreadsheet = SpreadsheetApp.openById(id);
+    } else {
+        spreadsheet = SpreadsheetApp.getActive();
+        setSpreadsheet(spreadsheet);
+    }
+    return spreadsheet;
+}
+
+export function setSpreadsheet(
+    spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet
+) {
+    const id = spreadsheet && spreadsheet.getId();
+    return Terse.PropertiesService.setUserProperty(SPREADSHEET, id);
+}
+
+export function getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
+    const spreadsheet = getSpreadsheet();
+    let sheet = null;
+    if (spreadsheet) {
+        const name = Terse.PropertiesService.getUserProperty(SHEET);
+        if (name) {
+            sheet = spreadsheet.getSheetByName(name);
+        } else {
+            sheet = spreadsheet.getActiveSheet();
+            setSheet(sheet);
         }
-        return Terse.PropertiesService.deleteUserProperty(State.FOLDER);
     }
+    return sheet;
+}
 
-    public static getSpreadsheet(): GoogleAppsScript.Spreadsheet.Spreadsheet {
-        var spreadsheet = Terse.PropertiesService.getUserProperty(
-            State.SPREADSHEET,
-            (id) => id && SpreadsheetApp.openById(id)
-        );
-        if (!spreadsheet) {
-            spreadsheet = SpreadsheetApp.getActive();
-            this.setSpreadsheet(spreadsheet);
-        }
-        return spreadsheet;
-    }
+export function setSheet(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
+    const name = sheet && sheet.getName();
+    setSpreadsheet(sheet && sheet.getParent());
+    return Terse.PropertiesService.setUserProperty(SHEET, name);
+}
 
-    public static setSpreadsheet(
-        spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet
-    ) {
-        if (spreadsheet) {
-            return Terse.PropertiesService.setUserProperty(
-                State.SPREADSHEET,
-                spreadsheet.getId()
-            );
-        }
-        return Terse.PropertiesService.deleteUserProperty(State.SPREADSHEET);
-    }
-
-    public static getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
-        const spreadsheet = State.getSpreadsheet();
-        if (spreadsheet) {
-            var sheet = Terse.PropertiesService.getUserProperty(
-                State.SHEET,
-                (name) => name && spreadsheet.getSheetByName(name)
-            );
-            if (!sheet) {
-                sheet = spreadsheet.getActiveSheet();
-                this.setSheet(sheet);
-            }
-            return sheet;
-        }
-        return null;
-    }
-
-    public static setSheet(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
-        if (sheet) {
-            State.setSpreadsheet(sheet.getParent());
-
-            return Terse.PropertiesService.setUserProperty(
-                State.SHEET,
-                sheet.getName()
-            );
-        }
-        return Terse.PropertiesService.deleteUserProperty(State.SHEET);
-    }
-
-    public static getSelection(): GoogleAppsScript.Spreadsheet.Range {
-        const sheet = State.getSheet();
-        if (sheet) {
-            var selection = Terse.PropertiesService.getUserProperty(
-                State.SELECTION,
-                (a1notation) => a1notation && sheet.getRange(a1notation)
-            );
-            if (!selection) {
-                selection = sheet.getActiveRange();
-                this.setSelection(selection);
-            }
-            return selection;
-        }
-        return null;
-    }
-
-    public static setSelection(range: GoogleAppsScript.Spreadsheet.Range) {
+export function getSelection(): GoogleAppsScript.Spreadsheet.Range {
+    const sheet = getSheet();
+    let selection = null;
+    if (sheet) {
+        const range = Terse.PropertiesService.getUserProperty(SELECTION);
         if (range) {
-            State.setSheet(range.getSheet());
-            return Terse.PropertiesService.setUserProperty(
-                State.SELECTION,
-                range.getA1Notation()
-            );
+            selection = sheet.getRange(range);
+        } else {
+            selection = sheet.getActiveRange();
+            setSelection(selection);
         }
-        return Terse.PropertiesService.deleteUserProperty(State.SELECTION);
     }
+    return selection;
+}
 
-    public static getList(): School.Lists.Metadata {
-        return Terse.PropertiesService.getUserProperty(State.LIST, JSON.parse);
-    }
+export function setSelection(range: GoogleAppsScript.Spreadsheet.Range) {
+    const a1notation = range && range.getA1Notation();
+    setSheet(range && range.getSheet());
+    return Terse.PropertiesService.setUserProperty(SELECTION, a1notation);
+}
 
-    public static setList(list: School.Lists.Metadata) {
-        if (list) {
-            return Terse.PropertiesService.setUserProperty(
-                State.LIST,
-                JSON.stringify(list)
-            );
-        }
-        return Terse.PropertiesService.deleteUserProperty(State.LIST);
-    }
+export const getList = Terse.PropertiesService.getUserProperty.bind(
+    null,
+    LIST
+) as () => SKY.School.Lists.Metadata;
+export const setList = Terse.PropertiesService.setUserProperty.bind(null, LIST);
+export const getData = Terse.PropertiesService.getUserProperty.bind(null, DATA);
+export const setData = Terse.PropertiesService.setUserProperty.bind(null, DATA);
 
-    public static getData() {
-        return Terse.PropertiesService.getUserProperty(State.DATA, JSON.parse);
-    }
+export function appendData(page) {
+    const data = getData() || [];
+    data.push(...page);
+    setData(data);
+}
 
-    public static setData(data) {
-        if (data) {
-            return Terse.PropertiesService.setUserProperty(
-                State.DATA,
-                JSON.stringify(data)
-            );
-        }
-        return Terse.PropertiesService.deleteUserProperty(State.DATA);
-    }
+export const getPage = Terse.PropertiesService.getUserProperty.bind(
+    null,
+    PAGE
+) as () => number;
+export const setPage = Terse.PropertiesService.setUserProperty.bind(null, PAGE);
+export const getIntent = Terse.PropertiesService.getUserProperty.bind(
+    null,
+    INTENT
+) as () => Intent;
+export const setIntent = Terse.PropertiesService.setUserProperty.bind(
+    null,
+    INTENT
+);
 
-    public static appendData(page) {
-        const data = State.getData() || [];
-        data.push(...page);
-        State.setData(data);
-    }
+export function reset() {
+    Terse.PropertiesService.deleteUserProperty(FOLDER);
+    Terse.PropertiesService.deleteUserProperty(SPREADSHEET);
+    Terse.PropertiesService.deleteUserProperty(SHEET);
+    Terse.PropertiesService.deleteUserProperty(SELECTION);
+    Terse.PropertiesService.deleteUserProperty(LIST);
+    Terse.PropertiesService.deleteUserProperty(DATA);
+    Terse.PropertiesService.deleteUserProperty(PAGE);
+    setIntent(Intent.CreateSpreadsheet);
+}
 
-    public static getPage(): number {
-        return Terse.PropertiesService.getUserProperty(State.PAGE, parseInt);
-    }
+export function update(arg) {
+    if (arg) {
+        var {
+            parameters: { state },
+        } = arg;
+        if (state) {
+            state = JSON.parse(state);
+            if (state.folder) {
+                setFolder(DriveApp.getFolderById(state.folder));
+            }
 
-    public static setPage(page: number) {
-        return Terse.PropertiesService.setUserProperty(State.PAGE, page.toString());
-    }
-
-    public static getIntent(): Intent {
-        return Terse.PropertiesService.getUserProperty(State.INTENT);
-    }
-
-    public static setIntent(intent: Intent) {
-        return Terse.PropertiesService.setUserProperty(State.INTENT, intent);
-    }
-
-    public static reset() {
-        Terse.PropertiesService.deleteUserProperty(State.FOLDER);
-        Terse.PropertiesService.deleteUserProperty(State.SPREADSHEET);
-        Terse.PropertiesService.deleteUserProperty(State.SHEET);
-        Terse.PropertiesService.deleteUserProperty(State.SELECTION);
-        Terse.PropertiesService.deleteUserProperty(State.LIST);
-        Terse.PropertiesService.deleteUserProperty(State.DATA);
-        Terse.PropertiesService.deleteUserProperty(State.PAGE);
-        State.setIntent(Intent.CreateSpreadsheet);
-    }
-
-    public static update(arg) {
-        if (arg) {
-            var {
-                parameters: { state },
-            } = arg;
-            if (state) {
-                state = JSON.parse(state);
-                if (state.folder) {
-                    State.setFolder(DriveApp.getFolderById(state.folder));
-                }
-
-                var spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
-                if (state.spreadsheet) {
-                    spreadsheet = SpreadsheetApp.openById(state.spreadsheet);
-                }
-                var sheet: GoogleAppsScript.Spreadsheet.Sheet;
-                if (state.sheet) {
-                    spreadsheet = spreadsheet || State.getSpreadsheet();
-                    sheet = spreadsheet.getSheetByName(state.sheet);
-                }
-                if (state.selection) {
-                    sheet = sheet || State.getSheet();
-                    State.setSelection(sheet.getRange(state.selection));
-                } else if (sheet) {
-                    State.setSheet(sheet);
-                } else if (spreadsheet) {
-                    State.setSpreadsheet(spreadsheet);
-                }
-                if (state.list) {
-                    State.setList(state.list);
-                }
-                if (state.page) {
-                    State.setPage(state.page);
-                }
-                if (state.data) {
-                    State.setData(state.data);
-                }
-                if (state.intent) {
-                    State.setIntent(state.intent);
-                }
+            var spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
+            if (state.spreadsheet) {
+                spreadsheet = SpreadsheetApp.openById(state.spreadsheet);
+            }
+            var sheet: GoogleAppsScript.Spreadsheet.Sheet;
+            if (state.sheet) {
+                spreadsheet = spreadsheet || getSpreadsheet();
+                sheet = spreadsheet.getSheetByName(state.sheet);
+            }
+            if (state.selection) {
+                sheet = sheet || getSheet();
+                setSelection(sheet.getRange(state.selection));
+            } else if (sheet) {
+                setSheet(sheet);
+            } else if (spreadsheet) {
+                setSpreadsheet(spreadsheet);
+            }
+            if (state.list) {
+                setList(state.list);
+            }
+            if (state.page) {
+                setPage(state.page);
+            }
+            if (state.data) {
+                setData(state.data);
+            }
+            if (state.intent) {
+                setIntent(state.intent);
             }
         }
     }
+}
 
-    public static toString(): string {
-        const folder = State.getFolder();
-        const intent = State.getIntent();
-        const spreadsheet = State.getSpreadsheet();
-        const sheet = State.getSheet();
-        const selection = State.getSelection();
-        const list = State.getList();
-        const page = State.getPage();
-        const data = State.getData();
-        return JSON.stringify(
-            {
-                folder: folder && folder.getId(),
-                intent,
-                spreadsheet: spreadsheet && spreadsheet.getId(),
-                sheet: sheet && sheet.getName(),
-                selection: selection && selection.getA1Notation(),
-                list,
-                page,
-                data,
-            },
-            null,
-            2
-        );
-    }
+export function toString(): string {
+    const folder = getFolder();
+    const intent = getIntent();
+    const spreadsheet = getSpreadsheet();
+    const sheet = getSheet();
+    const selection = getSelection();
+    const list = getList();
+    const page = getPage();
+    const data = getData();
+    return JSON.stringify(
+        {
+            folder: folder && folder.getId(),
+            intent,
+            spreadsheet: spreadsheet && spreadsheet.getId(),
+            sheet: sheet && sheet.getName(),
+            selection: selection && selection.getA1Notation(),
+            list,
+            page,
+            data,
+        },
+        null,
+        2
+    );
 }

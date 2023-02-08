@@ -1,11 +1,10 @@
-import { Terse } from '@battis/google-apps-script-helpers';
-import Drive from '../../Drive';
-import State from '../../State';
+import { Terse } from '@battis/gas-lighter';
+import * as Drive from '../../Drive';
+import * as State from '../../State';
 import { listsCard } from '../Lists/Lists';
 import { optionsCard } from '../Sheets/Options';
-import { errorCard } from './Error';
 
-export function homeCard(event?) {
+export function homeCard(event?: GoogleAppsScript.Events.AppsScriptEvent) {
     const folder = State.getFolder();
     State.reset();
     if (event) {
@@ -17,22 +16,12 @@ export function homeCard(event?) {
     if (State.getSelection()) {
         return optionsCard();
     }
-    return errorCard('Debugging', [
-        Terse.CardService.newDecoratedText({
-            topLabel: 'ActiveRange',
-            text: JSON.stringify(
-                SpreadsheetApp.getActive().getActiveRangeList(),
-                null,
-                2
-            ),
-        }),
-    ]);
     return listsCard();
 }
 
-export function homeAction(event?) {
+export function homeAction(event?: GoogleAppsScript.Events.AppsScriptEvent) {
     return Terse.CardService.replaceStack(homeCard());
 }
+
 global.action_app_home = homeAction;
-const Home = 'action_app_home';
-export default Home;
+export default 'action_app_home';

@@ -1,6 +1,6 @@
-import Sheets from '../../Sheets';
-import SKY from '../../SKY';
-import State, { Intent } from '../../State';
+import * as Sheets from '../../Sheets';
+import * as SKY from '../../SKY';
+import * as State from '../../State';
 import { sheetAppendedAction } from '../Sheets/SheetAppended';
 import { spreadsheetCreatedAction } from '../Sheets/SpreadsheetCreated';
 import { updatedAction } from '../Sheets/Updated';
@@ -16,7 +16,7 @@ export function insertDataAction(arg = null) {
 
     var range = null;
     switch (State.getIntent()) {
-        case Intent.AppendSheet:
+        case State.Intent.AppendSheet:
             const sheet = State.getSpreadsheet().insertSheet();
             range = Sheets.adjustRange(
                 {
@@ -29,7 +29,7 @@ export function insertDataAction(arg = null) {
                 sheet
             );
             break;
-        case Intent.ReplaceSelection:
+        case State.Intent.ReplaceSelection:
             State.getSelection().clearContent();
             range = Sheets.adjustRange(
                 {
@@ -41,8 +41,8 @@ export function insertDataAction(arg = null) {
                 State.getSelection()
             );
             break;
-        case Intent.UpdateExisting:
-            const metaRange = Sheets.metadata.get(Sheets.metadata.RANGE);
+        case State.Intent.UpdateExisting:
+            const metaRange = Sheets.Metadata.getRange();
             range = Sheets.adjustRange(
                 {
                     ...metaRange,
@@ -52,7 +52,7 @@ export function insertDataAction(arg = null) {
                 Sheets.rangeFromJSON(metaRange)
             );
             break;
-        case Intent.CreateSpreadsheet:
+        case State.Intent.CreateSpreadsheet:
         default:
             State.setSpreadsheet(
                 SpreadsheetApp.create(State.getList().name, data.length, data[0].length)
@@ -71,27 +71,19 @@ export function insertDataAction(arg = null) {
     range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
     const timestamp = new Date().toLocaleString();
 
-    Sheets.metadata.set(Sheets.metadata.LIST, State.getList(), range.getSheet());
-    Sheets.metadata.set(
-        Sheets.metadata.RANGE,
-        Sheets.rangeToJSON(range),
-        range.getSheet()
-    );
-    Sheets.metadata.set(
-        Sheets.metadata.LAST_UPDATED,
-        timestamp,
-        range.getSheet()
-    );
+    Sheets.Metadata.setList(range.getSheet(), State.getList());
+    Sheets.Metadata.setRange(range.getSheet(), Sheets.rangeToJSON(range));
+    Sheets.Metadata.setLastUpdated(range.getSheet(), timestamp);
     range
         .offset(0, 0, 1, 1)
         .setNote(`Last updated from "${State.getList().name}" ${timestamp}`);
 
     switch (State.getIntent()) {
-        case Intent.ReplaceSelection:
+        case State.Intent.ReplaceSelection:
             return updatedAction();
-        case Intent.UpdateExisting:
+        case State.Intent.UpdateExisting:
             return updatedAction();
-        case Intent.AppendSheet:
+        case State.Intent.AppendSheet:
             range.getSheet().setFrozenRows(1);
             const baseName = State.getList().name;
             var name = baseName;
@@ -104,7 +96,7 @@ export function insertDataAction(arg = null) {
             // TODO why isn't the appended sheet made active?
             State.getSpreadsheet().setActiveSheet(range.getSheet());
             return sheetAppendedAction();
-        case Intent.CreateSpreadsheet:
+        case State.Intent.CreateSpreadsheet:
         default:
             range.getSheet().setFrozenRows(1);
             range.getSheet().setName(State.getList().name);
