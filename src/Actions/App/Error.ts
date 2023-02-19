@@ -1,19 +1,19 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as State from '../../State';
 import Home from './Home';
 
 export function errorCard(header = 'An error occurred', widgets = []) {
-    return Terse.CardService.newCard({
+    return g.CardService.newCard({
         header,
         sections: [
-            Terse.CardService.newCardSection({
+            g.CardService.newCardSection({
                 widgets: [
                     ...widgets,
-                    Terse.CardService.newDecoratedText({
+                    g.CardService.newDecoratedText({
                         topLabel: 'State',
                         text: State.toString(),
                     }),
-                    Terse.CardService.newDecoratedText({
+                    g.CardService.newDecoratedText({
                         topLabel: 'UserProperties',
                         text: JSON.stringify(
                             PropertiesService.getUserProperties().getProperties(),
@@ -21,7 +21,7 @@ export function errorCard(header = 'An error occurred', widgets = []) {
                             2
                         ),
                     }),
-                    Terse.CardService.newTextButton({ text: 'Home', functionName: Home }),
+                    g.CardService.newTextButton({ text: 'Home', functionName: Home }),
                 ],
             }),
         ],
@@ -29,7 +29,7 @@ export function errorCard(header = 'An error occurred', widgets = []) {
 }
 
 export function errorAction(header?: string, widgets = []) {
-    return Terse.CardService.replaceStack(errorCard(header, widgets));
+    return g.CardService.replaceStack(errorCard(header, widgets));
 }
 global.action_app_error = errorAction;
 const Error = 'action_app_error';

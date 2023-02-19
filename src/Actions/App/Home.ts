@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as Drive from '../../Drive';
 import * as State from '../../State';
 import { listsCard } from '../Lists/Lists';
@@ -20,7 +20,7 @@ export function homeCard(event?: GoogleAppsScript.Events.AppsScriptEvent) {
 }
 
 export function homeAction(event?: GoogleAppsScript.Events.AppsScriptEvent) {
-    return Terse.CardService.replaceStack(homeCard());
+    return g.CardService.replaceStack(homeCard());
 }
 
 global.action_app_home = homeAction;

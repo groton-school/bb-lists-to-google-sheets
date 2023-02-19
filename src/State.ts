@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import { PREFIX } from './Constants';
 import * as SKY from './SKY';
 
@@ -21,7 +21,7 @@ const DATA = `${PREFIX}.State.data`;
 const PAGE = `${PREFIX}.State.page`;
 
 export function getFolder() {
-    const id = Terse.PropertiesService.getUserProperty(FOLDER);
+    const id = g.PropertiesService.getUserProperty(FOLDER);
     let folder = null;
     if (id) {
         folder = DriveApp.getFolderById(id);
@@ -31,11 +31,11 @@ export function getFolder() {
 
 export function setFolder(folder: GoogleAppsScript.Drive.Folder) {
     const id = folder && folder.getId();
-    return Terse.PropertiesService.setUserProperty(FOLDER, id);
+    return g.PropertiesService.setUserProperty(FOLDER, id);
 }
 
 export function getSpreadsheet(): GoogleAppsScript.Spreadsheet.Spreadsheet {
-    const id = Terse.PropertiesService.getUserProperty(SPREADSHEET);
+    const id = g.PropertiesService.getUserProperty(SPREADSHEET);
     let spreadsheet = null;
     if (id) {
         spreadsheet = SpreadsheetApp.openById(id);
@@ -50,14 +50,14 @@ export function setSpreadsheet(
     spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet
 ) {
     const id = spreadsheet && spreadsheet.getId();
-    return Terse.PropertiesService.setUserProperty(SPREADSHEET, id);
+    return g.PropertiesService.setUserProperty(SPREADSHEET, id);
 }
 
 export function getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
     const spreadsheet = getSpreadsheet();
     let sheet = null;
     if (spreadsheet) {
-        const name = Terse.PropertiesService.getUserProperty(SHEET);
+        const name = g.PropertiesService.getUserProperty(SHEET);
         if (name) {
             sheet = spreadsheet.getSheetByName(name);
         } else {
@@ -71,14 +71,14 @@ export function getSheet(): GoogleAppsScript.Spreadsheet.Sheet {
 export function setSheet(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
     const name = sheet && sheet.getName();
     setSpreadsheet(sheet && sheet.getParent());
-    return Terse.PropertiesService.setUserProperty(SHEET, name);
+    return g.PropertiesService.setUserProperty(SHEET, name);
 }
 
 export function getSelection(): GoogleAppsScript.Spreadsheet.Range {
     const sheet = getSheet();
     let selection = null;
     if (sheet) {
-        const range = Terse.PropertiesService.getUserProperty(SELECTION);
+        const range = g.PropertiesService.getUserProperty(SELECTION);
         if (range) {
             selection = sheet.getRange(range);
         } else {
@@ -92,16 +92,16 @@ export function getSelection(): GoogleAppsScript.Spreadsheet.Range {
 export function setSelection(range: GoogleAppsScript.Spreadsheet.Range) {
     const a1notation = range && range.getA1Notation();
     setSheet(range && range.getSheet());
-    return Terse.PropertiesService.setUserProperty(SELECTION, a1notation);
+    return g.PropertiesService.setUserProperty(SELECTION, a1notation);
 }
 
-export const getList = Terse.PropertiesService.getUserProperty.bind(
+export const getList = g.PropertiesService.getUserProperty.bind(
     null,
     LIST
 ) as () => SKY.School.Lists.Metadata;
-export const setList = Terse.PropertiesService.setUserProperty.bind(null, LIST);
-export const getData = Terse.PropertiesService.getUserProperty.bind(null, DATA);
-export const setData = Terse.PropertiesService.setUserProperty.bind(null, DATA);
+export const setList = g.PropertiesService.setUserProperty.bind(null, LIST);
+export const getData = g.PropertiesService.getUserProperty.bind(null, DATA);
+export const setData = g.PropertiesService.setUserProperty.bind(null, DATA);
 
 export function appendData(page) {
     const data = getData() || [];
@@ -109,28 +109,25 @@ export function appendData(page) {
     setData(data);
 }
 
-export const getPage = Terse.PropertiesService.getUserProperty.bind(
+export const getPage = g.PropertiesService.getUserProperty.bind(
     null,
     PAGE
 ) as () => number;
-export const setPage = Terse.PropertiesService.setUserProperty.bind(null, PAGE);
-export const getIntent = Terse.PropertiesService.getUserProperty.bind(
+export const setPage = g.PropertiesService.setUserProperty.bind(null, PAGE);
+export const getIntent = g.PropertiesService.getUserProperty.bind(
     null,
     INTENT
 ) as () => Intent;
-export const setIntent = Terse.PropertiesService.setUserProperty.bind(
-    null,
-    INTENT
-);
+export const setIntent = g.PropertiesService.setUserProperty.bind(null, INTENT);
 
 export function reset() {
-    Terse.PropertiesService.deleteUserProperty(FOLDER);
-    Terse.PropertiesService.deleteUserProperty(SPREADSHEET);
-    Terse.PropertiesService.deleteUserProperty(SHEET);
-    Terse.PropertiesService.deleteUserProperty(SELECTION);
-    Terse.PropertiesService.deleteUserProperty(LIST);
-    Terse.PropertiesService.deleteUserProperty(DATA);
-    Terse.PropertiesService.deleteUserProperty(PAGE);
+    g.PropertiesService.deleteUserProperty(FOLDER);
+    g.PropertiesService.deleteUserProperty(SPREADSHEET);
+    g.PropertiesService.deleteUserProperty(SHEET);
+    g.PropertiesService.deleteUserProperty(SELECTION);
+    g.PropertiesService.deleteUserProperty(LIST);
+    g.PropertiesService.deleteUserProperty(DATA);
+    g.PropertiesService.deleteUserProperty(PAGE);
     setIntent(Intent.CreateSpreadsheet);
 }
 

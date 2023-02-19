@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import { UNCATEGORIZED } from '../../Constants';
 import * as SKY from '../../SKY';
 import * as State from '../../State';
@@ -38,7 +38,7 @@ export function listsCard() {
     }
 
     const card = CardService.newCardBuilder().addSection(
-        Terse.CardService.newCardSection({
+        g.CardService.newCardSection({
             widgets: [
                 `Choose the list that you would like to import from Blackbaud into ${intentBasedActionDescription}.`,
             ],
@@ -59,13 +59,13 @@ export function listsCard() {
         sortCategoriesWithUncategorizedLast
     )) {
         card.addSection(
-            Terse.CardService.newCardSection({
+            g.CardService.newCardSection({
                 header: category === UNCATEGORIZED ? 'Uncategorized' : category,
                 widgets: lists[category].map((list) =>
-                    Terse.CardService.newDecoratedText({
+                    g.CardService.newDecoratedText({
                         text: list.name,
                     }).setOnClickAction(
-                        Terse.CardService.newAction({
+                        g.CardService.newAction({
                             functionName: ListDetail,
                             parameters: {
                                 state: { list },
@@ -81,7 +81,7 @@ export function listsCard() {
 
 export function listsAction(arg) {
     State.update(arg);
-    return Terse.CardService.pushCard(listsCard());
+    return g.CardService.pushCard(listsCard());
 }
 global.action_lists_lists = listsAction;
 export default 'action_lists_lists';

@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import { PREFIX } from '../Constants';
 
 export enum ResponseFormat {
@@ -13,10 +13,8 @@ export function getService() {
     return OAuth2.createService(`${PREFIX}.SKY`)
         .setAuthorizationBaseUrl('https://oauth2.sky.blackbaud.com/authorization')
         .setTokenUrl('https://oauth2.sky.blackbaud.com/token')
-        .setClientId(Terse.PropertiesService.getScriptProperty('SKY_CLIENT_ID'))
-        .setClientSecret(
-            Terse.PropertiesService.getScriptProperty('SKY_CLIENT_SECRET')
-        )
+        .setClientId(g.PropertiesService.getScriptProperty('SKY_CLIENT_ID'))
+        .setClientSecret(g.PropertiesService.getScriptProperty('SKY_CLIENT_SECRET'))
         .setPropertyStore(PropertiesService.getUserProperties())
         .setCache(CacheService.getUserCache())
         .setLock(LockService.getUserLock())
@@ -39,7 +37,7 @@ export function makeRequest(
     var maybeAuthorized = service.hasAccess();
     if (maybeAuthorized) {
         headers['Bb-Api-Subscription-Key'] =
-            Terse.PropertiesService.getScriptProperty('SKY_ACCESS_KEY');
+            g.PropertiesService.getScriptProperty('SKY_ACCESS_KEY');
         headers['Authorization'] = `Bearer ${service.getAccessToken()}`;
         lastResponse = UrlFetchApp.fetch(url, {
             method,
@@ -73,7 +71,7 @@ export function getLastResponse() {
 
 export function authorizationCard() {
     return [
-        Terse.CardService.newCard({
+        g.CardService.newCard({
             header: 'Authorization Required',
             widgets: [
                 'This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.',

@@ -1,16 +1,16 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as SKY from '../../SKY';
 import * as State from '../../State';
 import { insertDataAction } from './InsertData';
 
 export function loadNextPageCard() {
-    return Terse.CardService.newCard({
+    return g.CardService.newCard({
         header: State.getList().name,
         widgets: [
             'Due to limitations by Blackbaud (a rate-limited API) and by Google (time-limited execution of scripts), human interaction is required to load large data lists from Blackbaud.',
             `${State.getData().length - 1} records have been loaded from "${State.getList().name
             }" so far.`,
-            Terse.CardService.newTextButton({
+            g.CardService.newTextButton({
                 text: `Load Page ${State.getPage() + 1}`,
                 functionName: 'action_lists_loadNextPage',
             }),
@@ -29,7 +29,7 @@ export function loadNextPageAction() {
     ).slice(1); // trim off unneeded column labels
     State.appendData(data);
     if (data.length == SKY.PAGE_SIZE) {
-        return Terse.CardService.replaceStack(loadNextPageCard());
+        return g.CardService.replaceStack(loadNextPageCard());
     } else {
         return insertDataAction();
     }

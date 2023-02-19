@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as SKY from '../../SKY';
 import * as State from '../../State';
 import { insertDataAction } from './InsertData';
@@ -14,7 +14,7 @@ export function importDataAction(arg) {
     );
     if (State.getData().length == SKY.PAGE_SIZE + 1 /* column labels */) {
         State.setPage(1);
-        return Terse.CardService.replaceStack(loadNextPageCard());
+        return g.CardService.replaceStack(loadNextPageCard());
     } else {
         return insertDataAction();
     }

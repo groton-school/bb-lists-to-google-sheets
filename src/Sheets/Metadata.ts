@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 
 import { PREFIX } from '../Constants';
 import * as State from '../State';
@@ -10,7 +10,7 @@ const LAST_UPDATED = `${PREFIX}.lastUpdated`;
 function get(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
     sheet = sheet || State.getSheet();
     if (sheet) {
-        return Terse.SpreadsheetApp.DeveloperMetadata.get(sheet, key);
+        return g.SpreadsheetApp.DeveloperMetadata.get(sheet, key);
     }
     return null;
 }
@@ -26,7 +26,7 @@ function set(
 ) {
     sheet = sheet || State.getSheet();
     if (sheet) {
-        return Terse.SpreadsheetApp.DeveloperMetadata.set(sheet, key, value);
+        return g.SpreadsheetApp.DeveloperMetadata.set(sheet, key, value);
     }
     return false;
 }
@@ -38,7 +38,7 @@ export const setLastUpdated = set.bind(null, LAST_UPDATED);
 function remove(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
     sheet = sheet || State.getSheet();
     if (sheet) {
-        return Terse.SpreadsheetApp.DeveloperMetadata.remove(sheet, key);
+        return g.SpreadsheetApp.DeveloperMetadata.remove(sheet, key);
     }
     return null;
 }

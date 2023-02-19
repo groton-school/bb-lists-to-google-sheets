@@ -1,4 +1,4 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as State from '../../State';
 import ImportData from './ImportData';
 
@@ -13,14 +13,14 @@ export function listDetailCard() {
             break;
     }
 
-    return Terse.CardService.newCard({
+    return g.CardService.newCard({
         header: State.getList().name,
         widgets: [
-            Terse.CardService.newDecoratedText({
+            g.CardService.newDecoratedText({
                 topLabel: `${State.getList().type} List`,
                 text: State.getList().description,
             }),
-            Terse.CardService.newDecoratedText({
+            g.CardService.newDecoratedText({
                 topLabel: `Created by ${State.getList().created_by} ${new Date(
                     State.getList().created
                 ).toLocaleString()}`,
@@ -28,7 +28,7 @@ export function listDetailCard() {
                     State.getList().last_modified
                 ).toLocaleString()}`,
             }),
-            Terse.CardService.newTextButton({
+            g.CardService.newTextButton({
                 text: buttonNameBasedOnIntent,
                 functionName: ImportData,
             }),
@@ -38,7 +38,7 @@ export function listDetailCard() {
 
 export function listDetailAction(arg) {
     State.update(arg);
-    return Terse.CardService.pushCard(listDetailCard());
+    return g.CardService.pushCard(listDetailCard());
 }
 global.action_lists_detail = listDetailAction;
 export default 'action_lists_detail';
