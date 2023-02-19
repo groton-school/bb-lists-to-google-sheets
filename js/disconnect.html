@@ -1,0 +1,25 @@
+<script>
+  function replaceContent(html) {
+    document.getElementById('content').innerHTML = html;
+  }
+
+  function attachEvent(element, event, handler) {
+    if (element.attachEvent) {
+      element.attachEvent(event, handler);
+    } else {
+      element.addEventListener(event, handler);
+    }
+  }
+
+  attachEvent(
+    document.getElementById('cancel', 'click', () => google.script.host.close())
+  );
+  attachEvent(
+    document.getElementById('disconnect', 'click', () => {
+      replaceContent('Disconnecting…');
+      google.script.run
+        .withSuccessHandler(() => google.script.host.close())
+        .disconnectDeleteMetadata();
+    })
+  );
+</script>

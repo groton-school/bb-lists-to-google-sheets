@@ -1,14 +1,12 @@
 import * as g from '@battis/gas-lighter';
+import prefix from './Prefix';
 
-import { PREFIX } from '../Constants';
-import * as State from '../State';
-
-const LIST = `${PREFIX}.list`;
-const RANGE = `${PREFIX}.range`;
-const LAST_UPDATED = `${PREFIX}.lastUpdated`;
+const LIST = prefix('list');
+const RANGE = prefix('range');
+const LAST_UPDATED = prefix('lastUpdated');
 
 function get(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
-    sheet = sheet || State.getSheet();
+    sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
     if (sheet) {
         return g.SpreadsheetApp.DeveloperMetadata.get(sheet, key);
     }
@@ -24,7 +22,7 @@ function set(
     sheet: GoogleAppsScript.Spreadsheet.Sheet = null,
     value: any
 ) {
-    sheet = sheet || State.getSheet();
+    sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
     if (sheet) {
         return g.SpreadsheetApp.DeveloperMetadata.set(sheet, key, value);
     }
@@ -36,7 +34,7 @@ export const setRange = set.bind(null, RANGE);
 export const setLastUpdated = set.bind(null, LAST_UPDATED);
 
 function remove(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
-    sheet = sheet || State.getSheet();
+    sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
     if (sheet) {
         return g.SpreadsheetApp.DeveloperMetadata.remove(sheet, key);
     }

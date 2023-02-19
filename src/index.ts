@@ -1,5 +1,9 @@
-import { homeCard } from './Actions/App/Home';
+import * as g from '@battis/gas-lighter';
+import * as AddOn from './AddOn';
 
-global.launch = (event) => {
-    return homeCard(event);
-};
+global.onOpen = AddOn.onOpen;
+global.onInstall = AddOn.onInstall;
+
+global.include = g.HtmlService.include;
+global.getProgress = (thread: string) =>
+    g.HtmlService.Element.Progress.getProgress(thread);

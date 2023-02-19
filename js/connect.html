@@ -1,0 +1,80 @@
+<script>
+  const thread = '<?= data.thread ?>';
+
+  function replaceContent(html) {
+    document.getElementById('content').innerHTML = html;
+  }
+
+  function attachEvent(element, event, handler) {
+    if (element.attachEvent) {
+      element.attachEvent(event, handler);
+    } else {
+      element.addEventListener(event, handler);
+    }
+  }
+
+  function sortCategoriesWithUncategorizedLast(a, b) {
+    if (a == UNCATEGORIZED) {
+      return 1;
+    } else if (b == UNCATEGORIZED) {
+      return -1;
+    } else {
+      return a.localeCompare(b);
+    }
+  }
+
+  function showLists(lists) {
+    const content = document.getElementById('content');
+    replaceContent('');
+    lists.forEach((list) => {
+      const l = document.createElement('div');
+      l.id = list.id;
+      l.classList.add('list');
+      l.innerHTML = `<div class="name">${list.name}</div>
+        <div class="description">${list.description}</div>`;
+      attachEvent(content.appendElement(l), 'click', () => chooseTarget(list));
+    });
+  }
+
+  function chooseTarget(list) {
+    replaceContent(`<div>
+        <div>Where would you like the data from ${list.name} to be imported?</div>
+        <div class="bottom-right">
+            <button id="selection" class="button red">Replace Selection</button>
+            <button id="sheet" class="button action">Add a sheet</button>
+            <button id="spreadsheet" class="button action">Create a new spreadsheet</button>
+        </div>
+      </div>`);
+    attachEvent(document.getElementById('selection'), 'click', () =>
+      importData(list, 'selection')
+    );
+    attachEvent(document.getElementById('sheet'), 'click', () =>
+      importData(list, 'sheet')
+    );
+    attachEvent(document.getElementById('spreadsheet'), 'click', () =>
+      importData(list, 'spreadsheet')
+    );
+  }
+
+  function updateProgress() {
+    google.script.run
+      .withSuccessHandler((progress) => {
+        if (progress.complete) {
+          google.script.host.close();
+        } else {
+          document.getElementById('content').innerHTML = progress.html;
+          updateProgress();
+        }
+      })
+      .getProgress(thread);
+  }
+
+  function importData(list, target) {
+    replaceContent('Loading…');
+    google.script.run
+      .withSuccessHandler(updateProgress)
+      .importData(list, target, thread);
+  }
+
+  google.script.run.withSuccessHandler(showLists).connectGetLists();
+</script>

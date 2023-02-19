@@ -1,5 +1,5 @@
 import * as g from '@battis/gas-lighter';
-import { PREFIX } from '../Constants';
+import prefix from '../Prefix';
 
 export enum ResponseFormat {
     JSON,
@@ -10,7 +10,7 @@ export enum ResponseFormat {
 let lastResponse = null;
 
 export function getService() {
-    return OAuth2.createService(`${PREFIX}.SKY`)
+    return OAuth2.createService(prefix('SKY'))
         .setAuthorizationBaseUrl('https://oauth2.sky.blackbaud.com/authorization')
         .setTokenUrl('https://oauth2.sky.blackbaud.com/token')
         .setClientId(g.PropertiesService.getScriptProperty('SKY_CLIENT_ID'))
