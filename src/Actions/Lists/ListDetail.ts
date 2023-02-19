@@ -13,14 +13,14 @@ export function listDetailCard() {
             break;
     }
 
-    return g.CardService.newCard({
+    return g.CardService.Card.create({
         header: State.getList().name,
         widgets: [
-            g.CardService.newDecoratedText({
+            g.CardService.Widget.newDecoratedText({
                 topLabel: `${State.getList().type} List`,
                 text: State.getList().description,
             }),
-            g.CardService.newDecoratedText({
+            g.CardService.Widget.newDecoratedText({
                 topLabel: `Created by ${State.getList().created_by} ${new Date(
                     State.getList().created
                 ).toLocaleString()}`,
@@ -28,7 +28,7 @@ export function listDetailCard() {
                     State.getList().last_modified
                 ).toLocaleString()}`,
             }),
-            g.CardService.newTextButton({
+            g.CardService.Widget.newTextButton({
                 text: buttonNameBasedOnIntent,
                 functionName: ImportData,
             }),
@@ -38,7 +38,7 @@ export function listDetailCard() {
 
 export function listDetailAction(arg) {
     State.update(arg);
-    return g.CardService.pushCard(listDetailCard());
+    return g.CardService.Navigation.pushCard(listDetailCard());
 }
 global.action_lists_detail = listDetailAction;
 export default 'action_lists_detail';

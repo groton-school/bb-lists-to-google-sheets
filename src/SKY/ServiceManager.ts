@@ -71,7 +71,7 @@ export function getLastResponse() {
 
 export function authorizationCard() {
     return [
-        g.CardService.newCard({
+        g.CardService.Card.create({
             header: 'Authorization Required',
             widgets: [
                 'This add-on needs access to your Blackbaud account. You need to give permission to this add-on to make calls to the Blackbaud SKY API on your behalf.',

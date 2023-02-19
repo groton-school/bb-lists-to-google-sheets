@@ -1,22 +1,22 @@
-import { Terse } from '@battis/gas-lighter';
+import * as g from '@battis/gas-lighter';
 import * as State from '../../State';
 import Home from './Home';
 
 export function stateCard(header = 'Application State') {
-    return Terse.CardService.newCard({
+    return g.CardService.Card.create({
         header,
         widgets: [
-            Terse.CardService.newDecoratedText({
+            g.CardService.Widget.newDecoratedText({
                 topLabel: 'State',
                 text: State.toString(),
             }),
-            Terse.CardService.newTextButton({ text: 'Home', functionName: Home }),
+            g.CardService.Widget.newTextButton({ text: 'Home', functionName: Home }),
         ],
     });
 }
 
 export function stateAction(header?: string) {
-    return Terse.CardService.pushCard(stateCard(header));
+    return g.CardService.Navigation.pushCard(stateCard(header));
 }
 
 global.action_app_state = stateAction;

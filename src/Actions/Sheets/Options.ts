@@ -7,22 +7,24 @@ import ConfirmBreakConnection from './ConfirmBreakConnection';
 
 export function optionsCard() {
     const card = CardService.newCardBuilder().setHeader(
-        g.CardService.newCardHeader(`${State.getSpreadsheet().getName()} Options`)
+        g.CardService.Card.newCardHeader(
+            `${State.getSpreadsheet().getName()} Options`
+        )
     );
 
     const metaList = Sheets.Metadata.getList();
     if (metaList) {
         card.addSection(
-            g.CardService.newCardSection({
+            g.CardService.Card.newCardSection({
                 widgets: [
-                    g.CardService.newDecoratedText({
+                    g.CardService.Widget.newDecoratedText({
                         topLabel: State.getSheet().getName(),
                         text: `Update the data in the current sheet with the current "${metaList.name}" data from Blackbaud.`,
                         bottomLabel: `Last updated ${Sheets.Metadata.getLastUpdated() || 'at an unknown time'
                             }`,
                     }),
                     'If the updated data contains more rows or columns than the current data, rows and/or columns will be added to the right and bottom of the current data to make room for the updated data without overwriting other information on the sheet. If the updated data contains fewer rows or columns than the current data, all non-overwritten rows and/or columns in the current data will be cleared of data.',
-                    g.CardService.newTextButton({
+                    g.CardService.Widget.newTextButton({
                         text: 'Update',
                         functionName: ImportData,
                         parameters: {
@@ -32,7 +34,7 @@ export function optionsCard() {
                             },
                         },
                     }),
-                    g.CardService.newTextButton({
+                    g.CardService.Widget.newTextButton({
                         text: 'Break Connection',
                         functionName: ConfirmBreakConnection,
                     }),
@@ -41,13 +43,13 @@ export function optionsCard() {
         );
     } else {
         card.addSection(
-            g.CardService.newCardSection({
+            g.CardService.Card.newCardSection({
                 widgets: [
-                    g.CardService.newDecoratedText({
+                    g.CardService.Widget.newDecoratedText({
                         topLabel: State.getSheet().getName(),
                         text: `Select a range in the sheet "${State.getSheet().getName()}" to replace with data from Blackbaud`,
                     }),
-                    g.CardService.newTextButton({
+                    g.CardService.Widget.newTextButton({
                         text: 'Replace Selection',
                         functionName: Lists,
                         parameters: {
@@ -62,16 +64,16 @@ export function optionsCard() {
     }
     return card
         .addSection(
-            g.CardService.newCardSection({
+            g.CardService.Card.newCardSection({
                 widgets: [
-                    g.CardService.newTextButton({
+                    g.CardService.Widget.newTextButton({
                         text: 'Append New Sheet',
                         functionName: Lists,
                         parameters: {
                             state: { intent: State.Intent.AppendSheet },
                         },
                     }),
-                    g.CardService.newTextButton({
+                    g.CardService.Widget.newTextButton({
                         text: 'New Spreadsheet',
                         functionName: Lists,
                         parameters: {
@@ -85,7 +87,7 @@ export function optionsCard() {
 }
 
 export function optionsAction() {
-    return g.CardService.replaceStack(optionsCard());
+    return g.CardService.Navigation.replaceStack(optionsCard());
 }
 global.action_sheets_options = optionsAction;
 export default 'action_sheets_options';

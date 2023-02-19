@@ -38,7 +38,7 @@ export function listsCard() {
     }
 
     const card = CardService.newCardBuilder().addSection(
-        g.CardService.newCardSection({
+        g.CardService.Card.newCardSection({
             widgets: [
                 `Choose the list that you would like to import from Blackbaud into ${intentBasedActionDescription}.`,
             ],
@@ -59,13 +59,13 @@ export function listsCard() {
         sortCategoriesWithUncategorizedLast
     )) {
         card.addSection(
-            g.CardService.newCardSection({
+            g.CardService.Card.newCardSection({
                 header: category === UNCATEGORIZED ? 'Uncategorized' : category,
                 widgets: lists[category].map((list) =>
-                    g.CardService.newDecoratedText({
+                    g.CardService.Widget.newDecoratedText({
                         text: list.name,
                     }).setOnClickAction(
-                        g.CardService.newAction({
+                        g.CardService.Action.create({
                             functionName: ListDetail,
                             parameters: {
                                 state: { list },
@@ -81,7 +81,7 @@ export function listsCard() {
 
 export function listsAction(arg) {
     State.update(arg);
-    return g.CardService.pushCard(listsCard());
+    return g.CardService.Navigation.pushCard(listsCard());
 }
 global.action_lists_lists = listsAction;
 export default 'action_lists_lists';

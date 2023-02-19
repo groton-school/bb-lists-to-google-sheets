@@ -19,8 +19,8 @@ export function homeCard(event?: GoogleAppsScript.Events.AppsScriptEvent) {
     return listsCard();
 }
 
-export function homeAction(event?: GoogleAppsScript.Events.AppsScriptEvent) {
-    return g.CardService.replaceStack(homeCard());
+export function homeAction() {
+    return g.CardService.Navigation.replaceStack(homeCard());
 }
 
 global.action_app_home = homeAction;

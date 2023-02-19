@@ -14,7 +14,7 @@ export function importDataAction(arg) {
     );
     if (State.getData().length == SKY.PAGE_SIZE + 1 /* column labels */) {
         State.setPage(1);
-        return g.CardService.replaceStack(loadNextPageCard());
+        return g.CardService.Navigation.replaceStack(loadNextPageCard());
     } else {
         return insertDataAction();
     }
