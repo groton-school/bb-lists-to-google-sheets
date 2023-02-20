@@ -15,6 +15,9 @@ const RANGE = prefix('range');
 const LAST_UPDATED = prefix('lastUpdated');
 
 function rangeToJSON(range: GoogleAppsScript.Spreadsheet.Range): Range {
+    if (!range) {
+        return null;
+    }
     return {
         row: range.getRow(),
         column: range.getColumn(),
@@ -25,6 +28,9 @@ function rangeToJSON(range: GoogleAppsScript.Spreadsheet.Range): Range {
 }
 
 function rangeFromJSON(json: Range): GoogleAppsScript.Spreadsheet.Range {
+    if (!json) {
+        return null;
+    }
     const sheet = SpreadsheetApp.getActive().getSheetByName(json.sheet);
     return sheet.getRange(json.row, json.column, json.numRows, json.numColumns);
 }

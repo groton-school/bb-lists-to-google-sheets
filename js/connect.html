@@ -1,5 +1,7 @@
 <script>
   const thread = '<?= data.thread ?>';
+  const selection = '<?= data.selection ?>';
+  const prevList = <?!= JSON.stringify(data.prevList) ?>;
   let target = null;
   let list = null;
 
@@ -42,9 +44,17 @@
 
   function chooseTarget(list) {
     replaceContent(`<div>
-        <div>Where would you like the data from ${list.name} to be imported?</div>
+        <div>Where would you like the data from "${list.name}" to be imported?${
+      prevList
+        ? ` (This sheet is already connected to "${prevList.name}" on Blackbaud, so you need to choose a new sheet or spreadsheet as a new destination for "${list.name}")`
+        : `If you choose to replace selection, <code>${selection}</code> will be replaced on this sheet.`
+    }</div>
         <div class="bottom-right">
-            <button id="selection" class="button red">Replace Selection</button>
+            ${
+              prevList
+                ? ''
+                : '<button id="selection" class="button red">Replace Selection</button>'
+            }
             <button id="sheet" class="button action">Add a sheet</button>
             <button id="spreadsheet" class="button action">Create a new spreadsheet</button>
         </div>

@@ -18,6 +18,6 @@
     replaceContent('Disconnecting…');
     google.script.run
       .withSuccessHandler(() => google.script.host.close())
-      .disconnectDeleteMetadata();
+      .disconnectRemoveMetadata();
   });
 </script>

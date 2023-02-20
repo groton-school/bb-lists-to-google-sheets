@@ -58,6 +58,7 @@ export default (
             frame.shift();
         }
         data.push(...frame);
+        // FIXME multipage updates are failing
         if (frame.length >= SKY.PAGE_SIZE) {
             progress.setStatus(`Loaded page ${page} (${data.length - 1} rows)`);
             progress.setValue(page++);
@@ -86,6 +87,7 @@ export default (
             );
             break;
         case Target.selection:
+            // FIXME data is not being written to selection
             sheet = spreadsheet.getActiveSheet();
             range = sheet.getActiveRange();
             range.clearContent();

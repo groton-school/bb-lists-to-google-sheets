@@ -1,4 +1,5 @@
 import * as g from '@battis/gas-lighter';
+import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
 import ImportData from './ImportData';
 
@@ -22,13 +23,16 @@ function groupCategories(
 
 export const getFunctionName = () => 'connect';
 global.connect = () => {
-    /**
-     * FIXME detect if sheet or selection is already connected
-     *   Route into Update or limit target options
-     */
+    const prevList = Metadata.getList();
+    const selection = SpreadsheetApp.getActive()
+        .getActiveSheet()
+        .getActiveRange()
+        .getA1Notation();
     SpreadsheetApp.getUi().showModalDialog(
         g.HtmlService.createTemplateFromFile('templates/connect', {
             thread: Utilities.getUuid(),
+            prevList,
+            selection,
         }),
         'Connect'
     );

@@ -4,14 +4,21 @@ import ImportData, { Target } from './ImportData';
 
 export const getFunctionName = () => 'update';
 global.update = () => {
-    /*
-     * FIXME detect if current sheet is actually updatable
-     *   Redirect into Connect workflow if not updateable
-     */
-    const thread = Utilities.getUuid();
-    SpreadsheetApp.getUi().showModalDialog(
-        g.HtmlService.Element.Progress.getHtmlOutput(thread),
-        'Updating'
-    );
-    ImportData(Metadata.getList(), Target.update, thread);
+    const list = Metadata.getList();
+    if (list) {
+        const thread = Utilities.getUuid();
+        SpreadsheetApp.getUi().showModalDialog(
+            g.HtmlService.Element.Progress.getHtmlOutput(thread),
+            'Updating'
+        );
+        ImportData(list, Target.update, thread);
+    } else {
+        SpreadsheetApp.getUi().showModalDialog(
+            g.HtmlService.createTemplateFromFile('templates/error', {
+                message:
+                    'No Blackbaud list is connected to this sheet as a data source, so nothing can be updated. Connect a data source to allow for updating.',
+            }).setHeight(100),
+            'Not Connected'
+        );
+    }
 };

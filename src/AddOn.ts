@@ -1,6 +1,5 @@
 import * as WorkFlow from './Workflow';
 
-// FIXME update list when new sheet activates
 export function onOpen() {
     let menu = SpreadsheetApp.getUi()
         .createAddonMenu()
