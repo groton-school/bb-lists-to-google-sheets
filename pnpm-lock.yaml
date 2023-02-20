@@ -8,7 +8,7 @@ specifiers:
   '@types/google-apps-script-oauth2': ^38.0.0
 
 dependencies:
-  '@battis/gas-lighter': github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663_233mpnshgondnicgpfxcgyo5ta
+  '@battis/gas-lighter': github.com/battis/gas-lighter/040ce7a7b5a20e79107e1bc2d380a642f4b73efe_233mpnshgondnicgpfxcgyo5ta
 
 devDependencies:
   '@battis/eslint-config': github.com/battis/eslint-config/b75f95c693836225c0dffb657a34ef3260c365f7_olqzgoudjanskusljexhgqvvhe
@@ -766,7 +766,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001456
+      caniuse-lite: 1.0.30001457
       electron-to-chromium: 1.4.302
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10_browserslist@4.21.5
@@ -824,8 +824,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite/1.0.30001456:
-    resolution: {integrity: sha512-XFHJY5dUgmpMV25UqaD4kVq2LsiaU5rS8fb0f17pCoXQiQslzmFgnfOxfvo1bTpTqf7dwG/N/05CnLCnOEKmzA==}
+  /caniuse-lite/1.0.30001457:
+    resolution: {integrity: sha512-SDIV6bgE1aVbK6XyxdURbUE89zY7+k1BBBaOwYwkNCglXlel/E7mELiHC64HQ+W0xSKlqWhV9Wh7iHxUjMs4fA==}
     dev: true
 
   /chalk/2.4.2:
@@ -3391,9 +3391,9 @@ packages:
       prettier: 2.8.4
     dev: true
 
-  github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663_233mpnshgondnicgpfxcgyo5ta:
-    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/5fa60199c483387b154ba3e3459d4b34f4830663}
-    id: github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663
+  github.com/battis/gas-lighter/040ce7a7b5a20e79107e1bc2d380a642f4b73efe_233mpnshgondnicgpfxcgyo5ta:
+    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/040ce7a7b5a20e79107e1bc2d380a642f4b73efe}
+    id: github.com/battis/gas-lighter/040ce7a7b5a20e79107e1bc2d380a642f4b73efe
     name: '@battis/gas-lighter'
     version: 0.1.0
     peerDependencies:

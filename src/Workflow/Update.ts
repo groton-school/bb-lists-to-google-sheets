@@ -13,12 +13,13 @@ global.update = () => {
         );
         ImportData(list, Target.update, thread);
     } else {
-        SpreadsheetApp.getUi().showModalDialog(
-            g.HtmlService.createTemplateFromFile('templates/error', {
-                message:
-                    'No Blackbaud list is connected to this sheet as a data source, so nothing can be updated. Connect a data source to allow for updating.',
-            }).setHeight(100),
-            'Not Connected'
-        );
+        g.SpreadsheetApp.Dialog.showModal({
+            message:
+                'No Blackbaud list is connected to this sheet as a data source, so nothing can be updated. Connect a data source to allow for updating.',
+            title: 'Not Connected',
+            functionName: 'dialogClose',
+        });
     }
 };
+
+global.updateDone = () => null;
