@@ -9,21 +9,6 @@ export enum Target {
     update,
 }
 
-function rangeToJSON(range) {
-    return {
-        row: range.getRow(),
-        column: range.getColumn(),
-        numRows: range.getNumRows(),
-        numColumns: range.getNumColumns(),
-        sheet: range.getSheet().getName(),
-    };
-}
-
-function rangeFromJSON(json) {
-    const sheet = SpreadsheetApp.getActive().getSheetByName(json.sheet);
-    return sheet.getRange(json.row, json.column, json.numRows, json.numColumns);
-}
-
 function adjustRange(
     { row, column, numRows, numColumns },
     range = null,
@@ -59,20 +44,24 @@ export default (
     const progress = g.HtmlService.Element.Progress.getInstance(thread);
     progress.reset();
     progress.setStatus('Loading…');
-    const data = [];
-    let page: any[][];
-    let count = 1;
+    const data: any[][] = [];
+    let frame: any[][];
+    let page = 1;
     let complete = false;
     do {
-        page = SKY.School.Lists.get(
+        frame = SKY.School.Lists.get(
             list.id,
-            SKY.ServiceManager.ResponseFormat.Array
+            SKY.ServiceManager.ResponseFormat.Array,
+            page
         ) as any[][];
-        data.push(page.splice(0, Math.min(1, data.length)));
-        if (page.length == SKY.PAGE_SIZE + 1) {
-            progress.setStatus(`Loaded page ${count} (${data.length - 1} rows)`);
-            progress.setValue(count++);
-            progress.setMax(count);
+        if (data.length > 0) {
+            frame.shift();
+        }
+        data.push(...frame);
+        if (frame.length >= SKY.PAGE_SIZE) {
+            progress.setStatus(`Loaded page ${page} (${data.length - 1} rows)`);
+            progress.setValue(page++);
+            progress.setMax(page);
         } else {
             progress.setStatus('Writing data to sheet');
             complete = true;
@@ -114,11 +103,12 @@ export default (
             const metaRange = Metadata.getRange();
             range = adjustRange(
                 {
-                    ...metaRange,
+                    row: metaRange.getRow(),
+                    column: metaRange.getColumn(),
                     numRows: data.length,
                     numColumns: data[0].length,
                 },
-                rangeFromJSON(metaRange)
+                metaRange
             );
             break;
         case Target.spreadsheet:
@@ -128,29 +118,22 @@ export default (
                 data.length,
                 data[0].length
             );
-            // FIXME once again not creating in desired folder
-            /*
-                                                                        if (State.getFolder()) {
-                                                                            DriveApp.getFileById(State.getSpreadsheet().getId()).moveTo(
-                                                                                State.getFolder()
-                                                                            );
-                                                                        }
-                                                                        */
             sheet = spreadsheet.getSheets()[0];
             range = sheet.getRange(1, 1, data.length, data[0].length);
     }
 
     range.setValues(data);
     range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
-    const timestamp = new Date().toLocaleString();
+    const timestamp = new Date();
 
-    Metadata.setList(range.getSheet(), list);
-    Metadata.setRange(range.getSheet(), rangeToJSON(range));
-    Metadata.setLastUpdated(range.getSheet(), timestamp);
+    Metadata.setList(list, range.getSheet());
+    Metadata.setRange(range, range.getSheet());
+    Metadata.setLastUpdated(timestamp, range.getSheet());
     range
         .offset(0, 0, 1, 1)
-        .setNote(`Last updated from "${list.name}" ${timestamp}`);
+        .setNote(`Last updated from "${list.name}" ${timestamp.toLocaleString()}`);
 
+    let message = 'Complete';
     switch (target) {
         case Target.sheet:
             range.getSheet().setFrozenRows(1);
@@ -161,11 +144,16 @@ export default (
                 name = `${baseName} ${i}`; // I don't like this format, but it mirrors Sheets naming conventions
             }
             range.getSheet().setName(name);
+            message = `${range.getSheet().getParent().getUrl()}#${range
+                .getSheet()
+                .getSheetId()}`;
             break;
         case Target.spreadsheet:
             range.getSheet().setFrozenRows(1);
             range.getSheet().setName(list.name);
+            message = range.getSheet().getParent().getUrl();
+            break;
     }
 
-    progress.setComplete('Complete');
+    progress.setComplete(message);
 };

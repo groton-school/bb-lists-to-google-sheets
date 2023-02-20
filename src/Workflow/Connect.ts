@@ -22,9 +22,14 @@ function groupCategories(
 
 export const getFunctionName = () => 'connect';
 global.connect = () => {
-    const thread = Utilities.getUuid();
+    /**
+     * FIXME detect if sheet or selection is already connected
+     *   Route into Update or limit target options
+     */
     SpreadsheetApp.getUi().showModalDialog(
-        g.HtmlService.createTemplateFromFile('templates/connect', { thread }),
+        g.HtmlService.createTemplateFromFile('templates/connect', {
+            thread: Utilities.getUuid(),
+        }),
         'Connect'
     );
 };

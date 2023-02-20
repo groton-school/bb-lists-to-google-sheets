@@ -11,15 +11,13 @@
     }
   }
 
-  attachEvent(
-    document.getElementById('cancel', 'click', () => google.script.host.close())
+  attachEvent(document.getElementById('cancel'), 'click', () =>
+    google.script.host.close()
   );
-  attachEvent(
-    document.getElementById('disconnect', 'click', () => {
-      replaceContent('Disconnecting…');
-      google.script.run
-        .withSuccessHandler(() => google.script.host.close())
-        .disconnectDeleteMetadata();
-    })
-  );
+  attachEvent(document.getElementById('disconnect'), 'click', () => {
+    replaceContent('Disconnecting…');
+    google.script.run
+      .withSuccessHandler(() => google.script.host.close())
+      .disconnectDeleteMetadata();
+  });
 </script>

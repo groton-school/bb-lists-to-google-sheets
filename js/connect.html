@@ -1,5 +1,7 @@
 <script>
   const thread = '<?= data.thread ?>';
+  let target = null;
+  let list = null;
 
   function replaceContent(html) {
     document.getElementById('content').innerHTML = html;
@@ -26,14 +28,16 @@
   function showLists(lists) {
     const content = document.getElementById('content');
     replaceContent('');
-    lists.forEach((list) => {
-      const l = document.createElement('div');
-      l.id = list.id;
-      l.classList.add('list');
-      l.innerHTML = `<div class="name">${list.name}</div>
+    for (const category in lists) {
+      for (const list of lists[category]) {
+        const l = document.createElement('div');
+        l.id = list.id;
+        l.classList.add('list');
+        l.innerHTML = `<div class="name">${list.name}</div>
         <div class="description">${list.description}</div>`;
-      attachEvent(content.appendElement(l), 'click', () => chooseTarget(list));
-    });
+        attachEvent(content.appendChild(l), 'click', () => chooseTarget(list));
+      }
+    }
   }
 
   function chooseTarget(list) {
@@ -60,7 +64,21 @@
     google.script.run
       .withSuccessHandler((progress) => {
         if (progress.complete) {
-          google.script.host.close();
+          if (target == 'selection') {
+            google.script.host.close();
+          } else {
+            replaceContent(`<div>The ${target} has been created and connected to "${
+              list.name
+            }".</div>
+            <div class="bottom-right"><a id="open" href="${
+              progress.complete
+            }" target="${
+              target == 'sheet' ? '_top' : '_blank'
+            }">Open ${target}</a</div>`);
+            attachEvent(document.getElementById('open'), 'click', () =>
+              google.script.host.close()
+            );
+          }
         } else {
           document.getElementById('content').innerHTML = progress.html;
           updateProgress();
@@ -69,7 +87,9 @@
       .getProgress(thread);
   }
 
-  function importData(list, target) {
+  function importData(l, t) {
+    list = l;
+    target = t;
     replaceContent('Loading…');
     google.script.run
       .withSuccessHandler(updateProgress)

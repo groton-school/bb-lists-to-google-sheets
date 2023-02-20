@@ -1,9 +1,33 @@
 import * as g from '@battis/gas-lighter';
 import prefix from './Prefix';
+import * as SKY from './SKY';
+
+type Range = {
+    row: number;
+    column: number;
+    numRows: number;
+    numColumns: number;
+    sheet: string;
+};
 
 const LIST = prefix('list');
 const RANGE = prefix('range');
 const LAST_UPDATED = prefix('lastUpdated');
+
+function rangeToJSON(range: GoogleAppsScript.Spreadsheet.Range): Range {
+    return {
+        row: range.getRow(),
+        column: range.getColumn(),
+        numRows: range.getNumRows(),
+        numColumns: range.getNumColumns(),
+        sheet: range.getSheet().getName(),
+    };
+}
+
+function rangeFromJSON(json: Range): GoogleAppsScript.Spreadsheet.Range {
+    const sheet = SpreadsheetApp.getActive().getSheetByName(json.sheet);
+    return sheet.getRange(json.row, json.column, json.numRows, json.numColumns);
+}
 
 function get(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
     sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
@@ -13,9 +37,14 @@ function get(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
     return null;
 }
 
-export const getList = get.bind(null, LIST);
-export const getRange = get.bind(null, RANGE);
-export const getLastUpdated = get.bind(null, LAST_UPDATED);
+export const getList = (
+    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+): SKY.School.Lists.Metadata => get(LIST, sheet);
+export const getRange = (sheet: GoogleAppsScript.Spreadsheet.Sheet = null) =>
+    rangeFromJSON(get(RANGE, sheet));
+export const getLastUpdated = (
+    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+) => get(LAST_UPDATED, sheet);
 
 function set(
     key: string,
@@ -29,9 +58,18 @@ function set(
     return false;
 }
 
-export const setList = set.bind(null, LIST);
-export const setRange = set.bind(null, RANGE);
-export const setLastUpdated = set.bind(null, LAST_UPDATED);
+export const setList = (
+    list: SKY.School.Lists.Metadata,
+    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+) => set(LIST, sheet, list);
+export const setRange = (
+    range: GoogleAppsScript.Spreadsheet.Range,
+    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+) => set(RANGE, sheet, rangeToJSON(range));
+export const setLastUpdated = (
+    lastUpdated: Date,
+    sheet: GoogleAppsScript.Spreadsheet.Sheet
+) => set(LAST_UPDATED, sheet, lastUpdated.toLocaleString());
 
 function remove(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
     sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();

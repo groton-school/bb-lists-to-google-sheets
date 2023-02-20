@@ -8,12 +8,12 @@ specifiers:
   '@types/google-apps-script-oauth2': ^38.0.0
 
 dependencies:
-  '@battis/gas-lighter': github.com/battis/gas-lighter/a5f8c7d6939b8b1f92ee101cdf87bb4dca55a575_233mpnshgondnicgpfxcgyo5ta
+  '@battis/gas-lighter': github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663_233mpnshgondnicgpfxcgyo5ta
 
 devDependencies:
-  '@battis/eslint-config': github.com/battis/eslint-config/bbec12cb1d9ceab8bb017c8494f38034c00fea24_olqzgoudjanskusljexhgqvvhe
-  '@battis/prettier-config': github.com/battis/prettier-config/9daf9e290228c33473da8ff2fe608172c0269d97_prettier@2.8.4
-  '@battis/webpack-typescript-gas': github.com/battis/webpack-typescript-gas/6c59b38888ffae98a3ee21c4b5e0aa21c897f663_aurfrwnlapcmwwrjhauqhnysru
+  '@battis/eslint-config': github.com/battis/eslint-config/b75f95c693836225c0dffb657a34ef3260c365f7_olqzgoudjanskusljexhgqvvhe
+  '@battis/prettier-config': github.com/battis/prettier-config/e11904608d5b51e2e196f98c853ec5a2f7894e10_prettier@2.8.4
+  '@battis/webpack-typescript-gas': github.com/battis/webpack-typescript-gas/4c9c351c2adb8544c05469869afe9800e5e19957_aurfrwnlapcmwwrjhauqhnysru
   '@types/google-apps-script-oauth2': 38.0.0
 
 packages:
@@ -3364,9 +3364,9 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  github.com/battis/eslint-config/bbec12cb1d9ceab8bb017c8494f38034c00fea24_olqzgoudjanskusljexhgqvvhe:
-    resolution: {tarball: https://codeload.github.com/battis/eslint-config/tar.gz/bbec12cb1d9ceab8bb017c8494f38034c00fea24}
-    id: github.com/battis/eslint-config/bbec12cb1d9ceab8bb017c8494f38034c00fea24
+  github.com/battis/eslint-config/b75f95c693836225c0dffb657a34ef3260c365f7_olqzgoudjanskusljexhgqvvhe:
+    resolution: {tarball: https://codeload.github.com/battis/eslint-config/tar.gz/b75f95c693836225c0dffb657a34ef3260c365f7}
+    id: github.com/battis/eslint-config/b75f95c693836225c0dffb657a34ef3260c365f7
     name: '@battis/eslint-config'
     version: 1.0.0
     peerDependencies:
@@ -3391,9 +3391,9 @@ packages:
       prettier: 2.8.4
     dev: true
 
-  github.com/battis/gas-lighter/a5f8c7d6939b8b1f92ee101cdf87bb4dca55a575_233mpnshgondnicgpfxcgyo5ta:
-    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/a5f8c7d6939b8b1f92ee101cdf87bb4dca55a575}
-    id: github.com/battis/gas-lighter/a5f8c7d6939b8b1f92ee101cdf87bb4dca55a575
+  github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663_233mpnshgondnicgpfxcgyo5ta:
+    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/5fa60199c483387b154ba3e3459d4b34f4830663}
+    id: github.com/battis/gas-lighter/5fa60199c483387b154ba3e3459d4b34f4830663
     name: '@battis/gas-lighter'
     version: 0.1.0
     peerDependencies:
@@ -3408,9 +3408,9 @@ packages:
       typescript: 4.9.5
     dev: false
 
-  github.com/battis/prettier-config/9daf9e290228c33473da8ff2fe608172c0269d97_prettier@2.8.4:
-    resolution: {tarball: https://codeload.github.com/battis/prettier-config/tar.gz/9daf9e290228c33473da8ff2fe608172c0269d97}
-    id: github.com/battis/prettier-config/9daf9e290228c33473da8ff2fe608172c0269d97
+  github.com/battis/prettier-config/e11904608d5b51e2e196f98c853ec5a2f7894e10_prettier@2.8.4:
+    resolution: {tarball: https://codeload.github.com/battis/prettier-config/tar.gz/e11904608d5b51e2e196f98c853ec5a2f7894e10}
+    id: github.com/battis/prettier-config/e11904608d5b51e2e196f98c853ec5a2f7894e10
     name: '@battis/prettier-config'
     version: 1.0.0
     peerDependencies:
@@ -3419,9 +3419,9 @@ packages:
       prettier: 2.8.4
     dev: true
 
-  github.com/battis/webpack-typescript-gas/6c59b38888ffae98a3ee21c4b5e0aa21c897f663_aurfrwnlapcmwwrjhauqhnysru:
-    resolution: {tarball: https://codeload.github.com/battis/webpack-typescript-gas/tar.gz/6c59b38888ffae98a3ee21c4b5e0aa21c897f663}
-    id: github.com/battis/webpack-typescript-gas/6c59b38888ffae98a3ee21c4b5e0aa21c897f663
+  github.com/battis/webpack-typescript-gas/4c9c351c2adb8544c05469869afe9800e5e19957_aurfrwnlapcmwwrjhauqhnysru:
+    resolution: {tarball: https://codeload.github.com/battis/webpack-typescript-gas/tar.gz/4c9c351c2adb8544c05469869afe9800e5e19957}
+    id: github.com/battis/webpack-typescript-gas/4c9c351c2adb8544c05469869afe9800e5e19957
     name: '@battis/webpack-typescript-gas'
     version: 1.0.0
     peerDependencies:
