@@ -4,7 +4,7 @@ import * as AddOn from './AddOn';
 global.onOpen = AddOn.onOpen;
 global.onInstall = AddOn.onInstall;
 
+// TODO g.Globals.register();
 global.include = g.HtmlService.include;
-global.getProgress = (thread: string) =>
-    g.HtmlService.Element.Progress.getProgress(thread);
-global.dialogClose = g.UI.Dialog.close;
+global.getProgress = g.HtmlService.Element.Progress.getProgress;
+global.dialogClose = g.UI.Dialog.dialogClose;

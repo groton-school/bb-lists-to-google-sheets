@@ -1,6 +1,6 @@
 import * as g from '@battis/gas-lighter';
 import * as Metadata from '../Metadata';
-import ImportData, { Target } from './ImportData';
+import * as Import from './ImportData';
 
 export const getFunctionName = () => 'update';
 global.update = () => {
@@ -11,7 +11,7 @@ global.update = () => {
             g.HtmlService.Element.Progress.getHtmlOutput(thread),
             'Updating'
         );
-        ImportData(list, Target.update, thread);
+        Import.importData(list, Import.Target.Update, thread);
     } else {
         g.SpreadsheetApp.Dialog.showModal({
             message:

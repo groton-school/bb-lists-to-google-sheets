@@ -1,9 +1,8 @@
 import * as g from '@battis/gas-lighter';
 import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
-import ImportData from './ImportData';
 
-const UNCATEGORIZED = `@@uncategorized@@`;
+const UNCATEGORIZED = 'Uncategorized';
 
 function groupCategories(
     categories: { [category: string]: SKY.School.Lists.Metadata[] },
@@ -45,5 +44,3 @@ global.connectGetLists = () =>
             [UNCATEGORIZED]: [],
         }
     );
-
-global.importData = ImportData;
