@@ -1,4 +1,4 @@
-import * as g from '@battis/gas-lighter';
+import g from '@battis/gas-lighter';
 import prefix from '../Prefix';
 
 export enum ResponseFormat {

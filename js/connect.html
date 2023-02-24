@@ -1,7 +1,6 @@
 <?!= include('lib', data) ?>
 <script>
-  const thread = <?= data.thread ?>;
-  let target = null;
+  const thread = '<?!= data.thread ?>';
   let list = null;
 
   function sortCategoriesWithUncategorizedLast(a, b) {
@@ -29,7 +28,9 @@
         listElement.classList.add('list');
         listElement.innerHTML = `<div class="name">${list.name}</div>
         <div class="description">${list.description}</div>`;
-        attachEvent(categoryElement.appendChild(listElement), 'click', () => chooseTarget(list));
+        attachEvent(categoryElement.appendChild(listElement), 'click', () =>
+          chooseTarget(list)
+        );
       }
       content.appendChild(categoryElement);
     }
@@ -43,26 +44,24 @@
       .getImportTargetOptions(list);
   }
 
-  function importData(targetSelection) {
-    target = targetSelection;
+  function handleTargetSubmit(target) {
     replaceContent('Loading…');
     updateProgress();
-    google.script.run
-      .importData(list, target, thread);
+    google.script.run.importData(list, target, thread);
   }
 
   function updateProgress() {
-      google.script.run
-        .withSuccessHandler((progress) => {
-          if (progress.complete) {
-              replaceContent(progress.complete);
-          } else {
-            document.getElementById('content').innerHTML = progress.html;
-            updateProgress();
-          }
-        })
-        .getProgress(thread);
-    }
+    google.script.run
+      .withSuccessHandler((progress) => {
+        if (progress.complete) {
+          replaceContent(progress.complete);
+        } else {
+          document.getElementById('content').innerHTML = progress.html;
+          updateProgress();
+        }
+      })
+      .getProgress(thread);
+  }
 
   google.script.run.withSuccessHandler(showLists).connectGetLists();
 </script>

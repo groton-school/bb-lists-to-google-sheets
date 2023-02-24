@@ -1,4 +1,5 @@
-import * as g from '@battis/gas-lighter';
+import g from '@battis/gas-lighter';
+import { ResponseHandler } from '@battis/gas-lighter/src/UI/Dialog';
 import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
 
@@ -9,35 +10,7 @@ export enum Target {
     Update = 'update',
 }
 
-global.getImportTargetOptions = (list: SKY.School.Lists.Metadata) => {
-    const prevList = Metadata.getList();
-    const selection = SpreadsheetApp.getActive()
-        .getActiveSheet()
-        .getActiveRange()
-        .getA1Notation();
-    let message = `Where would you like the data from "${list.name}" to be imported?`;
-    let buttons: g.UI.Dialog.Button[] = [
-        { name: 'Add Sheet', value: 'sheet', class: 'action' },
-        { name: 'New Spreadsheet', value: 'spreadsheet', class: 'action' },
-    ];
-    if (prevList) {
-        message += ` This sheet is already connected to "${prevList.name}" on Blackbaud, so you need to choose a new sheet or spreadsheet as a new destination for "${list.name}"`;
-    } else {
-        message += ` If you choose to replace ${selection}, its contents will be erased and, if necessary, additional rows and/or columns will be added to make room for the data from "${list.name}".`;
-        buttons.unshift({
-            name: `Replace ${selection}`,
-            value: 'selection',
-            class: 'create',
-        });
-    }
-    return g.SpreadsheetApp.Dialog.getHtml({
-        message,
-        buttons,
-        functionName: 'importReturnTarget',
-    });
-};
-
-const callImportData: g.UI.Dialog.ResponseHandler = (target) => ({
+const callImportData: ResponseHandler = (target) => ({
     functionName: 'importData',
     args: [target],
 });
@@ -94,7 +67,6 @@ export function importData(
             );
             break;
         case Target.Selection:
-            // FIXME data is not being written to selection
             sheet = spreadsheet.getActiveSheet();
             range = sheet.getActiveRange();
             range.clearContent();
@@ -142,7 +114,7 @@ export function importData(
         .offset(0, 0, 1, 1)
         .setNote(`Last updated from "${list.name}" ${timestamp.toLocaleString()}`);
 
-    let message = 'Complete';
+    let message = 'Complete'; // FIXME Target.Selection needs its own dialog
     switch (target) {
         case Target.Sheet:
             range.getSheet().setFrozenRows(1);
@@ -165,6 +137,7 @@ export function importData(
             range.getSheet().setFrozenRows(1);
             range.getSheet().setName(list.name);
             message = g.SpreadsheetApp.Dialog.getHtml({
+                // FIXME everything from <br/> onward is being escaped (probably by the HtmlService)
                 message: `"${list.name
                     }" on Blackbaud has been connected to the sheet of the same name in the spreadsheet "${range
                         .getSheet()

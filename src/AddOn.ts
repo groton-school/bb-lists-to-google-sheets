@@ -1,7 +1,7 @@
 import * as WorkFlow from './Workflow';
 
 export function onOpen() {
-    let menu = SpreadsheetApp.getUi()
+    SpreadsheetApp.getUi()
         .createAddonMenu()
         .addItem('Connect…', WorkFlow.Connect.getFunctionName())
         .addItem(`Update…`, WorkFlow.Update.getFunctionName())

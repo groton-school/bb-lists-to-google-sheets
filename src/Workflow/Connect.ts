@@ -1,4 +1,4 @@
-import * as g from '@battis/gas-lighter';
+import g from '@battis/gas-lighter';
 import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
 
@@ -44,3 +44,31 @@ global.connectGetLists = () =>
             [UNCATEGORIZED]: [],
         }
     );
+
+global.getImportTargetOptions = (list: SKY.School.Lists.Metadata) => {
+    const prevList = Metadata.getList();
+    const selection = SpreadsheetApp.getActive()
+        .getActiveSheet()
+        .getActiveRange()
+        .getA1Notation();
+    let message = `Where would you like the data from "${list.name}" to be imported?`;
+    let buttons: g.UI.Dialog.Button[] = [
+        { name: 'Add Sheet', value: 'sheet', class: 'action' },
+        { name: 'New Spreadsheet', value: 'spreadsheet', class: 'action' },
+    ];
+    if (prevList) {
+        message += ` This sheet is already connected to "${prevList.name}" on Blackbaud, so you need to choose a new sheet or spreadsheet as a new destination for "${list.name}"`;
+    } else {
+        message += ` If you choose to replace ${selection}, its contents will be erased and, if necessary, additional rows and/or columns will be added to make room for the data from "${list.name}".`;
+        buttons.unshift({
+            name: `Replace ${selection}`,
+            value: 'selection',
+            class: 'create',
+        });
+    }
+    return g.SpreadsheetApp.Dialog.getHtml({
+        message,
+        buttons,
+        handler: 'handleTargetSubmit',
+    });
+};
