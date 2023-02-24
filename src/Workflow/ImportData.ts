@@ -121,7 +121,6 @@ function connectToSpreadsheet(numRows: number, numColumns: number) {
     return { target, list, spreadsheet, sheet, range, prevRange };
 }
 
-// FIXME going out of range on student enrollments
 function adjustRange(
     { row, column, numRows, numColumns },
     range = null,
@@ -130,19 +129,23 @@ function adjustRange(
     if (range) {
         sheet = range.getSheet();
         if (numRows > range.getNumRows()) {
-            sheet.insertRows(range.getLastRow() + 1, numRows - range.getNumRows());
+            progress.setStatus('Adding rows…');
+            sheet.insertRows(range.getLastRow(), numRows - range.getNumRows());
         }
         if (numColumns > range.getNumColumns()) {
+            progress.setStatus('Adding columns…');
             sheet.insertColumns(
-                range.getLastColumn() + 1,
+                range.getLastColumn(),
                 numColumns - range.getNumColumns()
             );
         }
     } else if (sheet) {
         if (numRows < sheet.getMaxRows()) {
+            progress.setStatus('Trimming rows…');
             sheet.deleteRows(numRows + 1, sheet.getMaxRows() - numRows);
         }
         if (numColumns < sheet.getMaxColumns()) {
+            progress.setStatus('Trimming columns…');
             sheet.deleteColumns(numColumns + 1, sheet.getMaxColumns() - numColumns);
         }
     }

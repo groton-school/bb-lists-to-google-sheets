@@ -17,9 +17,6 @@ global.update = () => {
             message:
                 'No Blackbaud list is connected to this sheet as a data source, so nothing can be updated. Connect a data source to allow for updating.',
             title: 'Not Connected',
-            functionName: 'dialogClose',
         });
     }
 };
-
-global.updateDone = () => null;

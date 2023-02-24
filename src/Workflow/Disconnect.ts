@@ -26,7 +26,6 @@ global.disconnect = () => {
             message:
                 'No Blackbaud list is connected to this sheet as a data source, so nothing can be disconnected.',
             title: 'Not Connected',
-            functionName: 'dialogClose',
         });
     }
 };
