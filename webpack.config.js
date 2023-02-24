@@ -1,4 +1,3 @@
-const path = require('path');
 const config = require('@battis/webpack-typescript-gas');
 
 c = config({ root: __dirname });

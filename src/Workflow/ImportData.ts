@@ -1,30 +1,57 @@
 import g from '@battis/gas-lighter';
-import { ResponseHandler } from '@battis/gas-lighter/src/UI/Dialog';
 import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
 
 export enum Target {
+    Update = 'update',
     Selection = 'selection',
     Sheet = 'sheet',
     Spreadsheet = 'spreadsheet',
-    Update = 'update',
 }
 
-const callImportData: ResponseHandler = (target) => ({
-    functionName: 'importData',
-    args: [target],
-});
-global.importReturnTarget = callImportData;
+let target: Target = null;
+let list: SKY.School.Lists.Metadata = null;
+const data: any[][] = [];
+let spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet = null;
+let sheet: GoogleAppsScript.Spreadsheet.Sheet = null;
+let range: GoogleAppsScript.Spreadsheet.Range = null;
+let prevRange: GoogleAppsScript.Spreadsheet.Range = null;
+let progress = null;
 
 export function importData(
-    list: SKY.School.Lists.Metadata,
-    target: Target,
+    l: SKY.School.Lists.Metadata,
+    t: Target,
     thread: string
 ) {
-    const progress = g.HtmlService.Element.Progress.getInstance(thread);
+    list = l;
+    target = t;
+    progress = g.HtmlService.Element.Progress.bindTo(thread);
     progress.reset();
+    progress.setMax(7);
     progress.setStatus('Loading…');
-    const data: any[][] = [];
+    progress.incrementValue();
+
+    loadData();
+    connectToSpreadsheet(data.length, data[0].length);
+
+    progress.setStatus('Writing data…');
+    progress.incrementValue();
+    range.setValues(data);
+    formatColumnHeaders();
+    if (target == Target.Sheet || target == Target.Spreadsheet) {
+        setNextAvailableSheetName();
+    }
+    updateMetadata();
+
+    progress.setComplete(
+        g.SpreadsheetApp.Dialog.getHtml({
+            message: getCompletionMessage(),
+        })
+    );
+}
+global.importData = importData;
+
+function loadData() {
     let frame: any[][];
     let page = 1;
     let complete = false;
@@ -38,126 +65,63 @@ export function importData(
             frame.shift();
         }
         data.push(...frame);
-        // FIXME multipage updates are failing
         if (frame.length >= SKY.PAGE_SIZE) {
-            progress.setStatus(`Loaded page ${page} (${data.length - 1} rows)`);
-            progress.setValue(page++);
-            progress.setMax(page);
+            progress.setStatus(`Loaded page ${page++} (${data.length - 1} rows)`);
+            progress.incrementValue();
+            progress.setMax(progress.getMax() + 1);
         } else {
-            progress.setStatus('Writing data to sheet');
             complete = true;
         }
     } while (!complete);
+}
 
-    let spreadsheet = SpreadsheetApp.getActive();
-    let sheet: GoogleAppsScript.Spreadsheet.Sheet = null;
-    let range: GoogleAppsScript.Spreadsheet.Range = null;
+function connectToSpreadsheet(numRows: number, numColumns: number) {
+    progress.setStatus('Connecting to spreadsheet…');
+    progress.incrementValue();
+    spreadsheet = SpreadsheetApp.getActive();
     switch (target) {
+        case Target.Update:
+        case Target.Selection:
+            sheet = spreadsheet.getActiveSheet();
+            if (target == Target.Update) {
+                prevRange = Metadata.getRange(sheet);
+            } else {
+                prevRange = sheet.getActiveRange();
+            }
+            prevRange.clearContent();
+            range = adjustRange(
+                {
+                    row: prevRange.getRow(),
+                    column: prevRange.getColumn(),
+                    numRows,
+                    numColumns,
+                },
+                prevRange
+            );
+            break;
         case Target.Sheet:
             sheet = spreadsheet.insertSheet();
             range = adjustRange(
                 {
                     row: 1,
                     column: 1,
-                    numRows: data.length,
-                    numColumns: data[0].length,
+                    numRows,
+                    numColumns,
                 },
                 null,
                 sheet
             );
             break;
-        case Target.Selection:
-            sheet = spreadsheet.getActiveSheet();
-            range = sheet.getActiveRange();
-            range.clearContent();
-            range = adjustRange(
-                {
-                    row: range.getRow(),
-                    column: range.getColumn(),
-                    numRows: data.length,
-                    numColumns: data[0].length,
-                },
-                range
-            );
-            break;
-        case Target.Update:
-            const metaRange = Metadata.getRange();
-            range = adjustRange(
-                {
-                    row: metaRange.getRow(),
-                    column: metaRange.getColumn(),
-                    numRows: data.length,
-                    numColumns: data[0].length,
-                },
-                metaRange
-            );
-            break;
         case Target.Spreadsheet:
-        default:
-            spreadsheet = SpreadsheetApp.create(
-                list.name,
-                data.length,
-                data[0].length
-            );
+            spreadsheet = SpreadsheetApp.create(list.name, numRows, numColumns);
             sheet = spreadsheet.getSheets()[0];
-            range = sheet.getRange(1, 1, data.length, data[0].length);
+            range = sheet.getRange(1, 1, numRows, numColumns);
     }
 
-    range.setValues(data);
-    range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
-    const timestamp = new Date();
-
-    Metadata.setList(list, range.getSheet());
-    Metadata.setRange(range, range.getSheet());
-    Metadata.setLastUpdated(timestamp, range.getSheet());
-    range
-        .offset(0, 0, 1, 1)
-        .setNote(`Last updated from "${list.name}" ${timestamp.toLocaleString()}`);
-
-    let message = 'Complete'; // FIXME Target.Selection needs its own dialog
-    switch (target) {
-        case Target.Sheet:
-            range.getSheet().setFrozenRows(1);
-            const baseName = list.name;
-            var name = baseName;
-            const spreadsheet = range.getSheet().getParent();
-            for (var i = 1; spreadsheet.getSheetByName(name); i++) {
-                name = `${baseName} ${i}`; // I don't like this format, but it mirrors Sheets naming conventions
-            }
-            range.getSheet().setName(name);
-            SpreadsheetApp.getActive().setActiveSheet(range.getSheet());
-            message = g.SpreadsheetApp.Dialog.getHtml({
-                message: `"${list.name
-                    }" on Blackbaud has been connected to the sheet "${range
-                        .getSheet()
-                        .getName()}" and the data has been imported.`,
-            });
-            break;
-        case Target.Spreadsheet:
-            range.getSheet().setFrozenRows(1);
-            range.getSheet().setName(list.name);
-            message = g.SpreadsheetApp.Dialog.getHtml({
-                // FIXME everything from <br/> onward is being escaped (probably by the HtmlService)
-                message: `"${list.name
-                    }" on Blackbaud has been connected to the sheet of the same name in the spreadsheet "${range
-                        .getSheet()
-                        .getParent()
-                        .getName()}" and the data has been imported.<br/>
-                    <a href="${range
-                        .getSheet()
-                        .getParent()
-                        .getUrl()}" target="_blank">Open ${range
-                            .getSheet()
-                            .getParent()
-                            .getName()}get</a>`,
-            });
-            break;
-    }
-
-    progress.setComplete(message);
+    return { target, list, spreadsheet, sheet, range, prevRange };
 }
-global.importData = importData;
 
+// FIXME going out of range on student enrollments
 function adjustRange(
     { row, column, numRows, numColumns },
     range = null,
@@ -183,4 +147,60 @@ function adjustRange(
         }
     }
     return sheet.getRange(row, column, numRows, numColumns);
+}
+
+function formatColumnHeaders() {
+    progress.setStatus('Formatting column headers…');
+    progress.incrementValue();
+    range.offset(0, 0, 1, range.getNumColumns()).setFontWeight('bold');
+    if (target == Target.Sheet || target == Target.Spreadsheet) {
+        sheet.setFrozenRows(1);
+    }
+}
+
+function updateMetadata() {
+    progress.setStatus('Updating metadata…');
+    progress.incrementValue();
+    const timestamp = new Date();
+    Metadata.setList(list, sheet);
+    Metadata.setRange(range, sheet);
+    Metadata.setLastUpdated(timestamp, sheet);
+    range
+        .offset(0, 0, 1, 1)
+        .setNote(`Last updated from "${list.name}" ${timestamp.toLocaleString()}`);
+}
+
+function setNextAvailableSheetName() {
+    progress.setStatus('Naming sheet…');
+    progress.incrementValue();
+    const baseName = list.name;
+    var name = baseName;
+    for (var i = 1; spreadsheet.getSheetByName(name); i++) {
+        name = `${baseName} ${i}`; // I don't like this format, but it mirrors Sheets naming conventions
+    }
+    sheet.setName(name);
+}
+
+function getCompletionMessage() {
+    switch (target) {
+        case Target.Update:
+            return `<code>${range.getA1Notation()}</code> has been updated with the latest data from "${list.name
+                }" on Blackbaud.${range.getA1Notation() != prevRange.getA1Notation()
+                    ? ` (The prior data occupied <code>${prevRange.getA1Notation()}</code>, so the sheet has been expanded rightward and downward to accommodate the increased amount of data.)`
+                    : ''
+                }`;
+        case Target.Selection:
+            return `<code>${range.getA1Notation()}</code> has been connected to "${list.name
+                }" on Blackbaud and the data has been imported.${range.getA1Notation() != prevRange.getA1Notation()
+                    ? ` (The original selection occupied <code>${prevRange.getA1Notation()}</code>, so the sheet has been expanded rightward and downward to accommodate the larger amount of data.)`
+                    : ''
+                }`;
+        case Target.Sheet:
+            return `"${list.name
+                }" on Blackbaud has been connected to the sheet "${sheet.getName()}" and the data has been imported.`;
+        case Target.Spreadsheet:
+            return `"${list.name
+                }" on Blackbaud has been connected to the sheet of the same name in the spreadsheet "${spreadsheet.getName()}" and the data has been imported.<br/>
+                    <a href="${spreadsheet.getUrl()}" target="_blank">Open ${spreadsheet.getName()}get</a>`;
+    }
 }

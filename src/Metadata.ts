@@ -32,58 +32,49 @@ function rangeFromJSON(json: Range): GoogleAppsScript.Spreadsheet.Range {
         return null;
     }
     const sheet = SpreadsheetApp.getActive().getSheetByName(json.sheet);
+    // TODO should this be resilient to sheet name changes?
     return sheet.getRange(json.row, json.column, json.numRows, json.numColumns);
 }
 
-function get(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
+const get = (key: string, sheet?: GoogleAppsScript.Spreadsheet.Sheet) => {
     sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
-    if (sheet) {
-        return g.SpreadsheetApp.DeveloperMetadata.get(sheet, key);
-    }
-    return null;
-}
+    return g.SpreadsheetApp.DeveloperMetadata.get(sheet, key);
+};
 
 export const getList = (
-    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+    sheet?: GoogleAppsScript.Spreadsheet.Sheet
 ): SKY.School.Lists.Metadata => get(LIST, sheet);
-export const getRange = (sheet: GoogleAppsScript.Spreadsheet.Sheet = null) =>
+export const getRange = (sheet?: GoogleAppsScript.Spreadsheet.Sheet) =>
     rangeFromJSON(get(RANGE, sheet));
-export const getLastUpdated = (
-    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
-) => get(LAST_UPDATED, sheet);
+export const getLastUpdated = (sheet?: GoogleAppsScript.Spreadsheet.Sheet) =>
+    get(LAST_UPDATED, sheet);
 
-function set(
+const set = (
     key: string,
     sheet: GoogleAppsScript.Spreadsheet.Sheet = null,
     value: any
-) {
+) => {
     sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
-    if (sheet) {
-        return g.SpreadsheetApp.DeveloperMetadata.set(sheet, key, value);
-    }
-    return false;
-}
+    return g.SpreadsheetApp.DeveloperMetadata.set(sheet, key, value);
+};
 
 export const setList = (
     list: SKY.School.Lists.Metadata,
-    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+    sheet?: GoogleAppsScript.Spreadsheet.Sheet
 ) => set(LIST, sheet, list);
 export const setRange = (
     range: GoogleAppsScript.Spreadsheet.Range,
-    sheet: GoogleAppsScript.Spreadsheet.Sheet = null
+    sheet?: GoogleAppsScript.Spreadsheet.Sheet
 ) => set(RANGE, sheet, rangeToJSON(range));
 export const setLastUpdated = (
     lastUpdated: Date,
-    sheet: GoogleAppsScript.Spreadsheet.Sheet
+    sheet?: GoogleAppsScript.Spreadsheet.Sheet
 ) => set(LAST_UPDATED, sheet, lastUpdated.toLocaleString());
 
-function remove(key: string, sheet: GoogleAppsScript.Spreadsheet.Sheet = null) {
+const remove = (key: string, sheet?: GoogleAppsScript.Spreadsheet.Sheet) => {
     sheet = sheet || SpreadsheetApp.getActive().getActiveSheet();
-    if (sheet) {
-        return g.SpreadsheetApp.DeveloperMetadata.remove(sheet, key);
-    }
-    return null;
-}
+    return g.SpreadsheetApp.DeveloperMetadata.remove(sheet, key);
+};
 
 export const removeList = remove.bind(null, LIST);
 export const removeRange = remove.bind(null, RANGE);

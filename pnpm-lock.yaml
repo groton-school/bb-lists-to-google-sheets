@@ -9,7 +9,7 @@ specifiers:
   rimraf: ^4.1.2
 
 dependencies:
-  '@battis/gas-lighter': github.com/battis/gas-lighter/f4ff094538c2676ffd6995df0a5bbfa17972db3d_djiwqiyjbwo4m7fwpd4ma42s4m
+  '@battis/gas-lighter': github.com/battis/gas-lighter/2d2110d8ce56e1b8aa84de8c8a34c218a8abab4c_djiwqiyjbwo4m7fwpd4ma42s4m
 
 devDependencies:
   '@battis/eslint-config': github.com/battis/eslint-config/b75f95c693836225c0dffb657a34ef3260c365f7_wsl6tvruuwzmgyl6ccazfsrw3i
@@ -769,7 +769,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001457
-      electron-to-chromium: 1.4.309
+      electron-to-chromium: 1.4.310
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10_browserslist@4.21.5
     dev: true
@@ -1113,8 +1113,8 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /electron-to-chromium/1.4.309:
-    resolution: {integrity: sha512-U7DTiKe4h+irqBG6h4EZ0XXaZuJj4md3xIXXaGSYhwiumPZ4BSc6rgf9UD0hVUMaeP/jB0q5pKWCPxvhO8fvZA==}
+  /electron-to-chromium/1.4.310:
+    resolution: {integrity: sha512-/xlATgfwkm5uDDwLw5nt/MNEf7c1oazLURMZLy39vOioGYyYzLWIDT8fZMJak6qTiAJ7udFTy7JG7ziyjNutiA==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -3399,9 +3399,9 @@ packages:
       prettier: 2.8.4
     dev: true
 
-  github.com/battis/gas-lighter/f4ff094538c2676ffd6995df0a5bbfa17972db3d_djiwqiyjbwo4m7fwpd4ma42s4m:
-    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/f4ff094538c2676ffd6995df0a5bbfa17972db3d}
-    id: github.com/battis/gas-lighter/f4ff094538c2676ffd6995df0a5bbfa17972db3d
+  github.com/battis/gas-lighter/2d2110d8ce56e1b8aa84de8c8a34c218a8abab4c_djiwqiyjbwo4m7fwpd4ma42s4m:
+    resolution: {tarball: https://codeload.github.com/battis/gas-lighter/tar.gz/2d2110d8ce56e1b8aa84de8c8a34c218a8abab4c}
+    id: github.com/battis/gas-lighter/2d2110d8ce56e1b8aa84de8c8a34c218a8abab4c
     name: '@battis/gas-lighter'
     version: 0.1.0
     peerDependencies:
