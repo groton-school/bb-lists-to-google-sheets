@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@battis/gas-lighter": "github:battis/gas-lighter#publish"
+    "@battis/gas-lighter": "github:battis/gas-lighter#dist"
   },
   "scripts": {
     "clean": "rimraf ./build",
