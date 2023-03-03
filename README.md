@@ -2,7 +2,7 @@
 
 Google Workspace Add-on to export/sync Blackbaud lists to Google Sheets
 
-# Setup
+## Setup
 
 Requires `Platform Manager` role on Blackbaud to access the list of lists
 from the SKY API.
@@ -20,3 +20,11 @@ Add the script as a Redirect URI on that Blackbaud app with a URL in the pattern
 ```
 https://script.google.com/macros/d/:script_id/usercallback
 ```
+
+## Privacy Policy
+
+This app stores no data separately from the Google Sheets that are managed. The metadata stored in the Google Sheets describes the Blackbaud list from which to refresh the data in the Sheet.
+
+## Terms of Service
+
+No warranty or liability is given or implied. Use at your own risk.
