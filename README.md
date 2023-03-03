@@ -1,4 +1,4 @@
-# Bb Lists to Google Sheets
+# Blackbaud-to-Google Lists
 
 Google Workspace Add-on to export/sync Blackbaud lists to Google Sheets
 
