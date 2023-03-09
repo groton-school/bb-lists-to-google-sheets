@@ -68,7 +68,7 @@ function loadData() {
         if (frame.length >= SKY.PAGE_SIZE) {
             progress.setStatus(`Loaded page ${page++} (${data.length - 1} rows)`);
             progress.incrementValue();
-            progress.setMax(progress.getMax() + 1);
+            progress.incrementMax();
         } else {
             complete = true;
         }

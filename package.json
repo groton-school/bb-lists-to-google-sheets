@@ -27,7 +27,7 @@
     "@battis/prettier-config": "github:battis/prettier-config",
     "@battis/webpack-typescript-gas": "github:battis/webpack-typescript-gas",
     "@types/google-apps-script-oauth2": "^38.0.0",
-    "rimraf": "^4.1.2"
+    "rimraf": "^4.4.0"
   },
   "prettier": "@battis/prettier-config",
   "eslintConfig": {
