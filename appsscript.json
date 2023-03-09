@@ -28,12 +28,16 @@
   "addOns": {
     "common": {
       "name": "Blackbaud Lists",
-      "logoUrl": "https://drive.google.com/uc?id\u003d1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+      "logoUrl": "https://drive.google.com/uc?id=1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
       "homepageTrigger": {
         "runFunction": "launch"
       }
     },
     "drive": {},
     "sheets": {}
+  },
+  "webapp": {
+    "executeAs": "USER_ACCESSING",
+    "access": "DOMAIN"
   }
 }
