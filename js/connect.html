@@ -50,18 +50,5 @@
     google.script.run.importData(list, target, thread);
   }
 
-  function updateProgress() {
-    google.script.run
-      .withSuccessHandler((progress) => {
-        if (progress.complete) {
-          replaceContent(progress.complete);
-        } else {
-          document.getElementById('content').innerHTML = progress.html;
-          updateProgress();
-        }
-      })
-      .getProgress(thread);
-  }
-
   google.script.run.withSuccessHandler(showLists).connectGetLists();
 </script>
