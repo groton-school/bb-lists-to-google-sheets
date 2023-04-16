@@ -1,2 +1,2 @@
 export default (...tokens: string[]) =>
-    `org.groton.BbListsToGoogleSheets.${tokens.join('.')}`;
+  `org.groton.BbListsToGoogleSheets.${tokens.join('.')}`;

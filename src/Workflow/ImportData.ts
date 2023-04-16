@@ -177,8 +177,8 @@ function setNextAvailableSheetName() {
     progress.setStatus('Naming sheet…');
     progress.incrementValue();
     const baseName = list.name;
-    var name = baseName;
-    for (var i = 1; spreadsheet.getSheetByName(name); i++) {
+    let name = baseName;
+    for (let i = 1; spreadsheet.getSheetByName(name); i++) {
         name = `${baseName} ${i}`; // I don't like this format, but it mirrors Sheets naming conventions
     }
     sheet.setName(name);

@@ -52,7 +52,7 @@ global.getImportTargetOptions = (list: SKY.School.Lists.Metadata) => {
         .getActiveRange()
         .getA1Notation();
     let message = `Where would you like the data from "${list.name}" to be imported?`;
-    let buttons: g.UI.Dialog.Button[] = [
+    const buttons: g.UI.Dialog.Button[] = [
         { name: 'Add Sheet', value: 'sheet', class: 'action' },
         { name: 'New Spreadsheet', value: 'spreadsheet', class: 'action' },
     ];
