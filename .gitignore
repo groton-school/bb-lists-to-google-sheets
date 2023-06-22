@@ -1,6 +1,4 @@
 .clasp.json
-/.nova/*
-!/.nova/Artwork
-!/.nova/Configuration.json
-/node_modules
-/build
+.env
+/node_modules/
+/build/
