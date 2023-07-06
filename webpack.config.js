@@ -1,6 +1,4 @@
-const config = require('@battis/gas-lighter/webpack.config');
-
-module.exports = config({
+module.exports = require('@battis/gas-lighter/webpack.config')({
   root: __dirname
   // production: false,
 });
