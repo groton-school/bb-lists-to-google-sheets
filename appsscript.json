@@ -27,8 +27,8 @@
   "runtimeVersion": "V8",
   "addOns": {
     "common": {
-      "name": "Blackbaud Lists",
-      "logoUrl": "https://drive.google.com/uc?id=1sany_QufWim04ZXwj1cMWh03E-cYHWk0",
+      "name": "Blackbaud-to-Google Lists",
+      "logoUrl": "https://groton-school.github.io/blackbaud-to-google-lists/marketplace/assets/logo.png",
       "homepageTrigger": {
         "runFunction": "launch"
       }
