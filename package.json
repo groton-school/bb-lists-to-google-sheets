@@ -15,7 +15,7 @@
     "url": "https://github.com/groton-school/blackbaud-to-google-lists/issues"
   },
   "dependencies": {
-    "@battis/gas-lighter": "^0.1.3"
+    "@battis/gas-lighter": "^0.2.0"
   },
   "scripts": {
     "clean": "shx rm -rf ./build",
