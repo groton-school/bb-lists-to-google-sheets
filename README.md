@@ -2,7 +2,13 @@
 
 Google Workspace Add-on to export/sync Blackbaud lists to Google Sheets
 
-## Setup
+## Install
+
+[Refer to my gist on Google Workspace Add-on publication](https://gist.github.com/battis/6e32031196316acd1b5e5700b328aef6#file-readme-md) for general directions on how to administratively publish a Google Workspace Add-on.
+
+This add-on is a `Sheets Add-on` in its GCP app configuration.
+
+## Blackbaud Setup
 
 Requires `Platform Manager` role on Blackbaud to access the list of lists
 from the SKY API.
