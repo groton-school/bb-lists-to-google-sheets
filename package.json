@@ -15,16 +15,18 @@
     "url": "https://github.com/groton-school/blackbaud-to-google-lists/issues"
   },
   "dependencies": {
-    "@battis/gas-lighter": "^0.2.1"
+    "@battis/gas-lighter": "file:../gas-lighter"
   },
   "scripts": {
     "build": "webpack",
-    "deploy": "clasp push"
+    "deploy": "run-s deploy:*",
+    "deploy:build": "npm run build",
+    "deploy:push": "clasp push --force"
   },
   "devDependencies": {
     "@battis/eslint-config": "latest",
     "@battis/prettier-config": "latest",
-    "@types/google-apps-script-oauth2": "^38.0.0"
+    "@types/google-apps-script-oauth2": "^38.0.1"
   },
   "prettier": "@battis/prettier-config",
   "eslintConfig": {

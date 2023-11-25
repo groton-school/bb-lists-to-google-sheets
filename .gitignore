@@ -1,4 +1,5 @@
-.clasp.json
 .env
 /node_modules/
 /build/
+/.clasp.json
+/*-setup.log

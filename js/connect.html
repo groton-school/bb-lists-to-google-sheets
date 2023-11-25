@@ -1,6 +1,6 @@
 <?!= include('lib', data) ?>
 <script>
-  const thread = '<?!= data.thread ?>';
+  const job = '<?!= data.job ?>';
   let list = null;
 
   function sortCategoriesWithUncategorizedLast(a, b) {
@@ -47,7 +47,7 @@
   function handleTargetSubmit(target) {
     replaceContent('Loading…');
     updateProgress();
-    google.script.run.importData(list, target, thread);
+    google.script.run.importData(list, target, job);
   }
 
   google.script.run.withSuccessHandler(showLists).connectGetLists();
