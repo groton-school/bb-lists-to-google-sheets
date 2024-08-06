@@ -1,6 +1,6 @@
-import g from '@battis/gas-lighter';
 import * as Metadata from '../Metadata';
 import * as SKY from '../SKY';
+import g from '@battis/gas-lighter';
 
 export enum Target {
   Update = 'update',
@@ -25,7 +25,7 @@ export function importData(
 ) {
   list = l;
   target = t;
-  progress = new g.HtmlService.Element.Progress.Tracker(job);
+  progress = new g.HtmlService.Element.Progress(job);
   progress.reset();
   progress.max = 7;
   progress.status = 'Loading…';
