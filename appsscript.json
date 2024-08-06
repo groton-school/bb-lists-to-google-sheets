@@ -28,7 +28,7 @@
   "addOns": {
     "common": {
       "name": "Blackbaud-to-Google Lists",
-      "logoUrl": "https://groton-school.github.io/blackbaud-to-google-lists/marketplace/assets/logo.png",
+      "logoUrl": "https://groton-school.github.io/blackbaud-to-google-lists/assets/icon-assets/icon-128px.png",
       "homepageTrigger": {
         "runFunction": "launch"
       }
